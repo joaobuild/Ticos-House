@@ -1,0 +1,16 @@
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
+Builds/
+.tools/
+TestResults/
+*.csproj
+*.sln
+*.user
+*.pidb
+*.pdb
+unity-release.json
+.vs/
+.DS_Store
