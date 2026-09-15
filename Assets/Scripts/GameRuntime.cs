@@ -241,7 +241,7 @@ namespace TicosHouse
             if(Button(54,505,470,"COMEÇAR A MADRUGADA   →"))StartNight();
             if(Button(54,567,224,"COMO JOGAR"))showHelp=!showHelp;
             if(Button(300,567,224,"SAIR"))Application.Quit();
-            Txt(54,675,600,28,"v0.1.0  •  USE FONES DE OUVIDO  •  TERROR SEM GORE",small);
+            Txt(54,675,600,28,"v"+Application.version+"  •  USE FONES DE OUVIDO  •  TERROR SEM GORE",small);
             Txt(855,101,330,42,"21:00 → 06:00",heading,teal);
             Txt(855,152,310,130,"PLATINA 3\n0 PDL\n\nA um Diamante do castigo.",text);
             if(showHelp){Panel(715,295,545,350,new Color(.02f,.035f,.045f,.98f));Help(746,316);}
@@ -265,7 +265,7 @@ namespace TicosHouse
         {
             Panel(32,87,1216,565,new Color(.027f,.043f,.063f,.99f));
             GUI.DrawTexture(new Rect(49,132,963,516),Fps.Texture,ScaleMode.StretchToFill);
-            Panel(49,99,963,33,new Color(.035f,.058f,.077f));Txt(64,104,355,26,"ASCENT    /    MIRA LIVRE • CÂMERA FIXA",small,teal);
+            Panel(49,99,963,33,new Color(.035f,.058f,.077f));Txt(64,104,400,26,"ASCENT / "+Fps.LocationName,small,teal);
             Txt(470,99,260,35,Fps.Blue+"   :   "+Fps.Red,heading);Txt(800,107,205,25,"PRIMEIRO A 13",small);
             Panel(1027,99,203,549,new Color(.026f,.035f,.049f));Txt(1043,110,174,32,"CHAMADA",text,teal);
             Txt(1043,151,178,40,Night.Internet?"●  conectado":"○  sem internet",small,Night.Internet?teal:red);
@@ -282,11 +282,18 @@ namespace TicosHouse
                 Txt(200,545,700,32,"Clique no botão ou pressione ENTER",small,amber);
             }
             else {
-                Txt(64,590,190,45,"HP  "+Fps.Health,heading,Fps.Health<30?red:pale);
+                Txt(64,590,280,45,"HP  "+Fps.Health+" / 150",heading,Fps.Health<40?red:pale);
                 Txt(790,590,215,45,Fps.ReloadRemaining>0?"RECARGA":Fps.Ammo+" / 24",heading);
                 Txt(64,554,220,30,"Q  PULSO TÁTICO",small,teal);
                 if(!Fps.PlayerDead&&Fps.Intermission<=0){float cx=49+Fps.Aim.x/960*963,cy=132+Fps.Aim.y/540*516;Color cc=Fps.HitFlash>0?red:teal;Panel(cx-9,cy,5,2,cc);Panel(cx+5,cy,5,2,cc);Panel(cx,cy-9,2,5,cc);Panel(cx,cy+5,2,5,cc);}
                 if(Fps.MuzzleFlash>0){Panel(651,450,12,17,new Color(1,.77f,.24f,.7f));Panel(644,457,25,4,new Color(1,.92f,.5f,.8f));}
+                foreach(var enemy in Fps.Bots)if(Fps.Visible(enemy)&&enemy.ShotFlash>0){
+                    float sx=49+(enemy.ScreenPos.x+enemy.Height*.12f)/960*963,sy=132+(enemy.ScreenPos.y-enemy.Height*.6f)/540*516;
+                    Panel(sx-7,sy-2,14,4,amber);Panel(sx-2,sy-7,4,14,Color.white);
+                    Vector2 from=new Vector2(sx,sy),to=enemy.AimedAtPlayer?new Vector2(530,620):new Vector2(sx+90,sy+60);
+                    Matrix4x4 saved=GUI.matrix;GUIUtility.RotateAroundPivot(Mathf.Atan2(to.y-from.y,to.x-from.x)*Mathf.Rad2Deg,from);
+                    Panel(from.x,from.y,Vector2.Distance(from,to),2,new Color(1,.62f,.22f,.65f));GUI.matrix=saved;
+                }
                 if(Fps.FeedTime>0)Txt(660,153,340,33,Fps.KillFeed,small,teal);
                 if(Fps.BannerTime>0||Fps.Intermission>0)Txt(250,194,560,50,Fps.Banner,center,amber);
                 if(Fps.PlayerDead)Txt(245,373,570,55,"VOCÊ CAIU  •  O TIME CONTINUA",center,red);

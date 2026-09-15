@@ -21,3 +21,7 @@ Valorant, Ascent e os personagens são propriedade da Riot Games. Este é um pro
 ## Áudio
 
 Efeitos sintetizados pelo código e treze falas provisórias em português geradas com a voz Microsoft Daniel instalada no Windows. As falas não imitam nem clonam as pessoas das fotos. A revisão de mixagem reduz picos, filtra ruído agudo, limita a sobreposição de tiros e remove o áudio de fones ao sair da cadeira.
+
+## Fundos adicionais 0.1.1
+
+AscentBombA.png e AscentMid.png gerados com image_gen (modo integrado), usando Ascent.png como referência de estilo. Prompts: pixel art 16:9 dentro do bomb A olhando Heaven/Hell; quadrado do meio olhando varanda/catwalk. Sem HUD ou inimigos, rifle no canto inferior direito. Interpretações artísticas de fã; não são capturas ou geometria extraída da Riot.

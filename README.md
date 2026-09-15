@@ -2,7 +2,7 @@
 
 Terror com comédia em primeira pessoa: Gustavo prometeu desligar o computador às 21h, mas entrou em mais uma partida com os amigos. O quarto, o FPS e a casa continuam funcionando ao mesmo tempo.
 
-**Versão 0.1.0 — Windows x64.**
+**Versão 0.1.1 — Windows x64.**
 
 ## Objetivo
 
@@ -52,7 +52,7 @@ O jogo não acessa seu microfone, Discord ou roteador reais. Toda comunicação 
 
 ## Download
 
-Baixe em [Tico's House v0.1.0](https://github.com/joaobuild/Ticos-House/releases/tag/v0.1.0). Extraia a pasta inteira e abra `TicosHouse.exe`. Não é necessário instalar Unity.
+Baixe em [Tico's House v0.1.1](https://github.com/joaobuild/Ticos-House/releases/tag/v0.1.1). Extraia a pasta inteira e abra `TicosHouse.exe`. Não é necessário instalar Unity.
 
 ## Desenvolvimento
 
@@ -85,3 +85,8 @@ Veja [TESTING.md](Docs/TESTING.md) e [ARCHITECTURE.md](Docs/ARCHITECTURE.md).
 
 Conceito e personagens: grupo de amigos do Joaobuild. Implementação: projeto desenvolvido com assistência do Codex. Valorant, Ascent e os agentes pertencem à Riot Games. Projeto de fã não oficial, sem afiliação ou endosso.
 
+
+
+### Combate 0.1.1
+
+Gust tem 150 HP por round. Inimigos disparam traçantes e causam dano. Cada kill de Gust alterna o enquadramento da Ascent (Mercado B, bomb A, quadrado/varanda), preservando vida e munição. Fundos são interpretações artísticas de fã, sem navegação 3D no minijogo.

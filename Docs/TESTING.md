@@ -44,3 +44,7 @@ O runner usa o player real, renderização, física do quarto e métodos de game
 | Wi-Fi cortado mesmo na cama | Final inevitável |
 | M, V, −/+, Esc e volume geral | Controles de comunicação e mixagem |
 | Recomeçar | 21h, 0 PDL, internet online e uma única instância dos sistemas |
+
+## Regressão 0.1.1
+
+Build Windows validada com 34 verificações automatizadas (TICOS_QA_PASS): 150 HP, dano/efeito de tiro, morte, preservação de vida e estatísticas na troca de cenário, intervalo de reação, novos assets, munição, recarga, partida até 13, Final Hunt e restart. Fundos também renderizados diretamente da câmera para PNG e inspecionados. Execução oculta; não substitui playtest humano de dificuldade.

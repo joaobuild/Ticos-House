@@ -15,7 +15,7 @@ public static class BuildGame
             AssetDatabase.CreateAsset(new Material(Shader.Find("Unlit/Texture")),"Assets/Resources/PixelBackground.mat");
         if(AssetDatabase.LoadAssetAtPath<Material>("Assets/Resources/PixelAgent.mat")==null)
             AssetDatabase.CreateAsset(new Material(Shader.Find("Unlit/Transparent")),"Assets/Resources/PixelAgent.mat");
-        foreach(string path in new[]{"Assets/Resources/Art/Ascent.png","Assets/Resources/Art/Agents.png"}){
+        foreach(string path in Directory.GetFiles("Assets/Resources/Art","*.png")){
             var importer=AssetImporter.GetAtPath(path) as TextureImporter;
             if(importer!=null){importer.filterMode=FilterMode.Point;importer.mipmapEnabled=false;importer.alphaIsTransparency=true;importer.npotScale=TextureImporterNPOTScale.None;importer.maxTextureSize=2048;importer.textureCompression=TextureImporterCompression.Uncompressed;importer.SaveAndReimport();}
         }
@@ -32,7 +32,7 @@ public static class BuildGame
         EditorSceneManager.SaveScene(scene,"Assets/Scenes/Night.unity");
         EditorBuildSettings.scenes=new[]{new EditorBuildSettingsScene("Assets/Scenes/Night.unity",true)};
         PlayerSettings.companyName="Joaobuild";PlayerSettings.productName="Tico's House";
-        PlayerSettings.bundleVersion="0.1.0";PlayerSettings.defaultScreenWidth=1280;PlayerSettings.defaultScreenHeight=720;
+        PlayerSettings.bundleVersion="0.1.1";PlayerSettings.defaultScreenWidth=1280;PlayerSettings.defaultScreenHeight=720;
         PlayerSettings.fullScreenMode=FullScreenMode.Windowed;PlayerSettings.resizableWindow=true;
         PlayerSettings.runInBackground=true;
         PlayerSettings.SetScriptingBackend(UnityEditor.Build.NamedBuildTarget.Standalone,ScriptingImplementation.Mono2x);

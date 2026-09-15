@@ -56,19 +56,33 @@ namespace TicosHouse
             g.Fps.Intermission=0;Require(g.Fps.Bots.Count==9,"four allies and five enemies");
             Require(g.Fps.Bots.Where(b=>b.Ally).Select(b=>b.Name).Distinct().Count()==4,"unique randomized friend team");
             g.Fps.Tick(.8f,false);yield return Capture("03-computer");
+            Require(g.Fps.Health==150,"Gust starts with 150 health");
+            Require(Resources.Load<Texture2D>("Art/AscentBombA")!=null&&Resources.Load<Texture2D>("Art/AscentMid")!=null,"additional Ascent backgrounds included");
             var enemy=g.Fps.Bots.First(b=>!b.Ally);
             foreach(var b in g.Fps.Bots){b.Health=0;if(b.Model!=null)b.Model.gameObject.SetActive(false);}
             enemy.Health=100;enemy.SpawnAt=0;enemy.Model.gameObject.SetActive(true);
             g.Fps.Aim=g.Fps.HeadRect(enemy).center;
+            g.Fps.Health=117;int previousScenario=g.Fps.Scenario;
             Invoke(g.Fps,"Shoot");Require(g.Fps.Stats.Headshots==1&&g.Fps.Stats.Kills==1,"pixel head hitbox kill");
+            Require(g.Fps.Scenario!=previousScenario&&g.Fps.Health==117&&g.Fps.RoundKills==1,"kill changes viewpoint without healing or resetting round stats");
+            Require(g.Fps.TransitionRemaining>0,"viewpoint change grants reaction time");
+            for(int view=0;view<3;view++){
+                Invoke(g.Fps,"AdvanceScenario");g.Fps.Cam.Render();RenderTexture previous=RenderTexture.active;RenderTexture.active=g.Fps.Texture;
+                var capture=new Texture2D(g.Fps.Texture.width,g.Fps.Texture.height,TextureFormat.RGB24,false);capture.ReadPixels(new Rect(0,0,capture.width,capture.height),0,0);capture.Apply();
+                File.WriteAllBytes(Path.Combine(output,"ascent-view-"+g.Fps.Scenario+".png"),capture.EncodeToPNG());Destroy(capture);RenderTexture.active=previous;
+            }
             Require(g.Fps.Ammo==23&&g.Fps.Stats.Shots==1&&g.Fps.Stats.Hits==1,"ammo and hit stats consistent");
             g.Fps.NewMatch();g.Fps.Intermission=0;enemy=g.Fps.Bots.First(b=>!b.Ally);
             foreach(var b in g.Fps.Bots){b.Health=0;if(b.Model!=null)b.Model.gameObject.SetActive(false);}
             enemy.Health=100;enemy.Skill=1;enemy.SpawnAt=0;enemy.Model.gameObject.SetActive(true);
             g.Fps.Aim=g.Fps.BodyRect(enemy).center;Invoke(g.Fps,"Shoot");
             Require(enemy.Health==64&&g.Fps.Stats.Headshots==0,"body shot deals 36 without headshot");
-            for(int i=0;i<180&&g.Fps.Health==100;i++){Physics.SyncTransforms();g.Fps.Tick(.1f,false);}
-            Require(g.Fps.Health<100,"enemy attacks damage player");
+            Require(g.Fps.Health==150,"new match restores 150 health");
+            for(int i=0;i<180&&g.Fps.Health==150;i++){Physics.SyncTransforms();g.Fps.Tick(.1f,false);}
+            Require(g.Fps.Health<150&&enemy.ShotFlash>0&&enemy.AimedAtPlayer,"enemy attacks visibly damage player");
+            g.Fps.Health=1;enemy.Cooldown=0;g.Fps.Tick(.01f,false);
+            Require(g.Fps.Health==0&&g.Fps.PlayerDead&&g.Fps.Stats.Deaths==1,"enemy fire kills and counts one death");
+            g.Fps.NewMatch();g.Fps.Intermission=0;
             var oldAim=g.Fps.Aim;g.Fps.Aim=new Vector2(0,0);int oldHits=g.Fps.Stats.Hits;Invoke(g.Fps,"Shoot");Require(g.Fps.Stats.Hits==oldHits,"miss does not award hit");g.Fps.Aim=oldAim;
             g.Fps.Ammo=0;g.Fps.Reload();Require(g.Fps.ReloadRemaining>0,"empty magazine reload starts");g.Fps.Tick(1.5f,false);Require(g.Fps.Ammo==24,"reload restores magazine");
             g.Fps.NewMatch();g.Fps.Intermission=0;int frames=0;
