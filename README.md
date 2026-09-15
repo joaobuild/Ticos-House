@@ -2,7 +2,7 @@
 
 Terror com comédia em primeira pessoa: Gustavo prometeu desligar o computador às 21h, mas entrou em mais uma partida com os amigos. O quarto, o FPS e a casa continuam funcionando ao mesmo tempo.
 
-**Versão 0.1.2 — Windows x64.**
+**Versão 0.1.3 — Windows x64.**
 
 ## Objetivo
 
@@ -52,7 +52,7 @@ O jogo não acessa seu microfone, Discord ou roteador reais. Toda comunicação 
 
 ## Download
 
-Baixe em [Tico's House v0.1.2](https://github.com/joaobuild/Ticos-House/releases/tag/v0.1.2). Extraia a pasta inteira e abra `TicosHouse.exe`. Não é necessário instalar Unity.
+Baixe em [Tico's House v0.1.3](https://github.com/joaobuild/Ticos-House/releases/tag/v0.1.3). Extraia a pasta inteira e abra `TicosHouse.exe`. Não é necessário instalar Unity.
 
 ## Desenvolvimento
 
@@ -96,3 +96,8 @@ Gust tem 150 HP por round. Inimigos disparam traçantes e causam dano. Cada kill
 
 Inimigos fazem arrancadas e mudanças aleatórias de direção, com pausas curtas. Entram mais rápido e atiram com maior frequência e precisão. Cinco locais da Ascent: Mercado B, bomb A/Heaven, quadrado/varanda, bomb B/Boathouse e Árvore/Jardim. Gust mantém 150 HP e tempo de reação na troca.
 
+
+
+### Combate e comunicação 0.1.3
+
+Inimigos entram a cada 0,65 s e atiram a cada 0,32–0,56 s após o tempo inicial de reação. Acertos podem ser headshots (22% dos acertos; 75–95 de dano) ou tiros no corpo (26–36). Gust continua com 150 HP. Comunicação e estresse afetam a cadência e precisão dos aliados; aliados vivos oferecem cobertura, dividindo o foco inimigo. Acertos aliados suprimem a precisão do alvo por 0,65 s. Mortos não oferecem cobertura. Mutado ainda é possível vencer, mas o time ajuda significativamente menos.

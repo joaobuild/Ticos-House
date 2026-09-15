@@ -271,6 +271,7 @@ namespace TicosHouse
             Txt(1043,151,178,40,Night.Internet?"●  conectado":"○  sem internet",small,Night.Internet?teal:red);
             int i=0;foreach(var b in Fps.Bots)if(b.Ally){Txt(1043,202+i*40,180,32,b.Name,small,b.Alive?pale:new Color(.42f,.46f,.49f));i++;}
             Txt(1043,394,180,55,Night.MicOpen?"Gust  •  AO VIVO":"Gust  •  MUTADO",small,Night.MicOpen?amber:teal);
+            Txt(1043,352,180,40,"COBERTURA "+(Fps.TeamCover*100).ToString("0")+"%",small,teal);
             Txt(1043,453,180,95,"PLATINA 3\n"+Night.Pdl+" / 100 PDL\n"+Night.Wins+" vitórias",text);
             Txt(1043,580,180,60,"M  MIC\nV  ÁUDIO FPS",small);
             if(!Fps.Active||Fps.MatchOver) {
@@ -299,6 +300,7 @@ namespace TicosHouse
                 if(Fps.PlayerDead)Txt(245,373,570,55,"VOCÊ CAIU  •  O TIME CONTINUA",center,red);
                 if(Fps.LagRemaining>0)Txt(400,450,480,30,"INSTABILIDADE NA CONEXÃO",small,amber);
                 if(Fps.DamageFlash>0)Panel(49,132,963,516,new Color(1,.07f,.02f,Fps.DamageFlash*.7f));
+                if(Fps.EnemyHeadshotFlash>0)Txt(370,510,380,40,"HEADSHOT RECEBIDO",center,red);
                 if(Input.GetKey(KeyCode.Tab))Scoreboard();
             }
         }

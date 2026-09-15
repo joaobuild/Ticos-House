@@ -52,3 +52,9 @@ Build Windows validada com 34 verificações automatizadas (TICOS_QA_PASS): 150 
 ## Regressão 0.1.2
 
 37 verificações do player passaram, incluindo cinco fundos carregados, movimento com amplitude maior que 70 pixels e mais de oito inversões numa amostra determinística de 9,6 s, limites das hitboxes e proteção durante troca de cenário. Novos fundos renderizados pela câmera e inspecionados. Não houve teste humano de dificuldade.
+
+## Regressão 0.1.3
+
+Cobertura nova: amostra determinística de 100 disparos para verificar headshots, tiros no corpo e cadência; 300 ações aliadas por modo, com a mesma seed, comparando contribuição mutada e comunicação aberta. Verifica cobertura maior com comunicação e ausência de cobertura quando o aliado morre. Esses testes verificam o efeito mecânico, não equivalem a playtest humano de dificuldade.
+
+Resultado: 42 verificações do player aprovadas (TICOS_QA_PASS).

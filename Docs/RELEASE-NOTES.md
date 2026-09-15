@@ -1,4 +1,4 @@
-# Tico's House v0.1.2 — Windows x64
+# Tico's House v0.1.3 — Windows x64
 
 Primeira versão jogável do terror com comédia do Gust. Objetivo: sair de Platina 3 — 0 PDL e alcançar Diamante antes das 06h sem Tico descobrir.
 
@@ -49,3 +49,11 @@ Projeto de fã não oficial. Valorant, Ascent e os agentes pertencem à Riot Gam
 - Cinco enquadramentos: Mercado B, bomb A/Heaven, quadrado/varanda, bomb B/Boathouse e Árvore/Jardim. Troca a cada kill preserva vida e munição, com pausa de reação.
 - As ilustrações são interpretações de fã; balanceamento ainda sujeito a playtests humanos.
 
+
+
+## Alterações de combate 0.1.3 (substituem os valores anteriores)
+
+- Inimigos: tiros a cada 0,32–0,56 s, entrada a cada 0,65 s, corpo 26–36 e headshots 75–95 (22% dos acertos).
+- Comunicação melhora cadência e chance de acerto dos aliados. Eles suprimem a precisão dos inimigos atingidos por 0,65 s.
+- Cobertura depende da habilidade dos aliados vivos e comunicação: reduz o foco dos inimigos no Gust. Indicador na chamada e aviso de headshot recebido.
+- Mantidos 150 HP, cinco locais da Ascent e intervalo de reação na troca de cenário. Mutado não implica derrota automática.

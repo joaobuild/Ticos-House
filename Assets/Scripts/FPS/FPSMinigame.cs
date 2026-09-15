@@ -9,7 +9,7 @@ namespace TicosHouse
         public string Name; public bool Ally; public float Skill,Health=100,Cooldown,SpawnAt,Height=118,Phase;
         public int Kills,Deaths,Assists,Agent;public bool Exceptional,DamagedByPlayer;
         public Transform Model;public Vector2 ScreenPos;public float ShotFlash;public bool AimedAtPlayer;
-        public float Offset,MoveSpeed,DecisionRemaining;public int Direction;
+        public float Offset,MoveSpeed,DecisionRemaining,Suppressed;public int Direction;
         public bool Alive {get{return Health>0;}}
     }
     // Fixed-camera pixel aim shooter: mouse aim and AD strafing, no map navigation.
@@ -23,6 +23,10 @@ namespace TicosHouse
         public int ScenarioCount {get{return backgrounds.Length;}}
         public string LocationName {get{return new[]{"MERCADO B","BOMB A / HEAVEN","QUADRADO / VARANDA","BOMB B / BOATHOUSE","ÁRVORE / JARDIM"}[Scenario];}}
         public float TransitionRemaining;
+        public float EnemyHeadshotFlash;
+        public int EnemyHeadshots;
+        public float Coordination {get{return Mathf.InverseLerp(.55f,1.2f,Game.Night.Communication);}}
+        public float TeamCover {get{return Bots.Where(b=>b.Ally&&b.Alive).Sum(b=>b.Skill)/4f*Coordination;}}
         Material backgroundMaterial;Texture2D[] backgrounds;
         public float RoundTime,Intermission=3,ReloadRemaining,HitFlash,DamageFlash,FlashRemaining,LagRemaining,MuzzleFlash;
         public bool Active,MatchOver,LastWin,PlayerDead;
@@ -66,9 +70,9 @@ namespace TicosHouse
         }
         void NewRound()
         {
-            Health=MaxHealth;Ammo=24;RoundTime=0;RoundKills=0;PlayerDead=false;ReloadRemaining=0;FlashRemaining=0;abilityCooldown=0;Aim=new Vector2(480,270);TransitionRemaining=0;fireTime=0;DamageFlash=HitFlash=MuzzleFlash=0;
+            Health=MaxHealth;Ammo=24;RoundTime=0;RoundKills=0;PlayerDead=false;ReloadRemaining=0;FlashRemaining=0;abilityCooldown=0;Aim=new Vector2(480,270);TransitionRemaining=0;fireTime=0;DamageFlash=HitFlash=MuzzleFlash=EnemyHeadshotFlash=0;EnemyHeadshots=0;
             int e=0;foreach(var b in Bots){b.Health=100;b.DamagedByPlayer=false;b.Cooldown=Random.Range(.85f,1.3f);b.Phase=Random.Range(0,6.28f);
-                b.SpawnAt=b.Ally?0:e++*1.15f+.5f;b.Height=b.Agent%2==0?122:108;
+                b.SpawnAt=b.Ally?0:e++*.65f+.5f;b.Height=b.Agent%2==0?122:108;b.Suppressed=0;
                 b.Offset=Random.Range(-38f,38f);b.DecisionRemaining=0;b.Direction=Random.value<.5f?-1:1;
                 b.ShotFlash=0;if(!b.Ally){PlaceEnemy(b);b.Model.gameObject.SetActive(false);}
             }
@@ -109,7 +113,8 @@ namespace TicosHouse
         {
             if(!Active||MatchOver||!Game.Night.Internet||Game.Night.Result!=Ending.None)return;
             HitFlash=Mathf.Max(0,HitFlash-dt);DamageFlash=Mathf.Max(0,DamageFlash-dt);MuzzleFlash=Mathf.Max(0,MuzzleFlash-dt);FeedTime-=dt;BannerTime-=dt;
-            foreach(var b in Bots)b.ShotFlash=Mathf.Max(0,b.ShotFlash-dt);
+            EnemyHeadshotFlash=Mathf.Max(0,EnemyHeadshotFlash-dt);
+            foreach(var b in Bots){b.ShotFlash=Mathf.Max(0,b.ShotFlash-dt);b.Suppressed=Mathf.Max(0,b.Suppressed-dt);}
             if(Intermission>0){Intermission-=dt;if(Intermission<=0)NewRound();return;}
             if(TransitionRemaining>0){TransitionRemaining=Mathf.Max(0,TransitionRemaining-dt);return;}
             RoundTime+=dt;fireTime-=dt;abilityCooldown-=dt;FlashRemaining-=dt;LagRemaining=Mathf.Max(0,LagRemaining-dt);
@@ -152,19 +157,23 @@ namespace TicosHouse
         void UpdateBot(Combatant b,float dt)
         {
             if(!b.Ally&&!Visible(b))return;
-            b.Cooldown-=dt;if(b.Cooldown>0)return;b.Cooldown=b.Ally?Random.Range(1.4f,2.4f):Random.Range(.65f,1.05f);
+            b.Cooldown-=dt;if(b.Cooldown>0)return;b.Cooldown=b.Ally?Random.Range(1.05f,1.5f)*Mathf.Lerp(2f,1f,Coordination):Random.Range(.32f,.56f);
             if(b.Ally){
                 var enemies=Bots.Where(Visible).ToArray();if(enemies.Length==0)return;
                 var target=enemies[Random.Range(0,enemies.Length)];
-                if(Random.value<b.Skill*Game.Night.Communication*.40f){target.Health-=48;if(target.Health<=0)Kill(target,b);}
+                if(Random.value<b.Skill*Mathf.Lerp(.20f,.85f,Coordination)){
+                    target.Health-=48;target.Suppressed=.65f;
+                    if(target.Health<=0)Kill(target,b);
+                }
             }else{
                 Game.Audio.Fps("shot",new Vector3((b.ScreenPos.x-480)/18,0,0),.2f);
-                var friends=Bots.Where(x=>x.Ally&&x.Alive).ToArray();bool aimPlayer=!PlayerDead&&(friends.Length==0||Random.value<.75f);
+                var friends=Bots.Where(x=>x.Ally&&x.Alive).ToArray();bool aimPlayer=!PlayerDead&&(friends.Length==0||Random.value<.94f-TeamCover*.52f);
                 b.ShotFlash=.18f;b.AimedAtPlayer=aimPlayer;
-                float chance=b.Skill*(FlashRemaining>0?.12f:1);
+                float chance=b.Skill*(FlashRemaining>0?.12f:1)*(b.Suppressed>0?.55f:1);
                 if(Random.value<chance){
-                    if(aimPlayer){Health-=Random.Range(22,34);DamageFlash=.23f;if(Health<=0){Health=0;PlayerDead=true;Stats.Deaths++;if(RoundTime<7)Stats.EarlyDeaths++;Game.Night.Stress=Mathf.Min(100,Game.Night.Stress+6);b.Kills++;Banner="VOCÊ CAIU - o time continua";BannerTime=3;}}
-                    else if(friends.Length>0){var target=friends[Random.Range(0,friends.Length)];target.Health-=48;if(target.Health<=0)Kill(target,b);}
+                    bool headshot=Random.value<.22f;int damage=headshot?Random.Range(75,96):Random.Range(26,37);
+                    if(aimPlayer){if(headshot){EnemyHeadshots++;EnemyHeadshotFlash=.65f;}Health-=damage;DamageFlash=.23f;if(Health<=0){Health=0;PlayerDead=true;Stats.Deaths++;if(RoundTime<7)Stats.EarlyDeaths++;Game.Night.Stress=Mathf.Min(100,Game.Night.Stress+6);b.Kills++;Banner=headshot?"VOCÊ CAIU — HEADSHOT":"VOCÊ CAIU - o time continua";BannerTime=3;}}
+                    else if(friends.Length>0){var target=friends[Random.Range(0,friends.Length)];target.Health-=damage;if(target.Health<=0)Kill(target,b);}
                 }
                 if(Random.value<.3f)Game.Audio.Fps("step",new Vector3((b.ScreenPos.x-480)/18,0,0),.35f);
             }

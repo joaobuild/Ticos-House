@@ -93,6 +93,35 @@ namespace TicosHouse
             Require(g.Fps.Health<150&&enemy.ShotFlash>0&&enemy.AimedAtPlayer,"enemy attacks visibly damage player");
             g.Fps.Health=1;enemy.Cooldown=0;g.Fps.Tick(.01f,false);
             Require(g.Fps.Health==0&&g.Fps.PlayerDead&&g.Fps.Stats.Deaths==1,"enemy fire kills and counts one death");
+            randomState=UnityEngine.Random.state;UnityEngine.Random.InitState(1303);
+            int headshotsBefore=g.Fps.EnemyHeadshots;bool rapidFire=true;
+            for(int burst=0;burst<100;burst++){
+                g.Fps.Health=150;g.Fps.PlayerDead=false;enemy.Cooldown=0;
+                Invoke(g.Fps,"UpdateBot",enemy,.01f); // restore live round after prior death
+                if(g.Fps.Intermission>0){g.Fps.Intermission=0;burst--;continue;}
+                rapidFire&=enemy.Cooldown>=.32f&&enemy.Cooldown<=.56f;
+            }
+            Require(g.Fps.EnemyHeadshots>headshotsBefore&&g.Fps.EnemyHeadshots<headshotsBefore+100,"enemy fire includes headshots and body shots");
+            Require(rapidFire,"enemy cadence is 0.32 to 0.56 seconds");
+            UnityEngine.Random.state=randomState;
+            g.Fps.NewMatch();g.Fps.Intermission=0;
+            var ally=g.Fps.Bots.First(b=>b.Ally);enemy=g.Fps.Bots.First(b=>!b.Ally);
+            foreach(var b in g.Fps.Bots)b.Health=0;ally.Health=100;ally.Skill=.8f;enemy.Health=100;enemy.SpawnAt=0;
+            float savedStress=g.Night.Stress;bool savedMic=g.Night.MicOpen;g.Night.Stress=0;
+            float mutedDamage=0,openDamage=0,mutedCover=0,openCover=0;
+            randomState=UnityEngine.Random.state;
+            for(int mode=0;mode<2;mode++){
+                g.Night.MicOpen=mode==1;UnityEngine.Random.InitState(731);
+                if(mode==0)mutedCover=g.Fps.TeamCover;else openCover=g.Fps.TeamCover;
+                for(int duel=0;duel<300;duel++){
+                    enemy.Health=100;ally.Cooldown=0;Invoke(g.Fps,"UpdateBot",ally,.01f);
+                    if(mode==0)mutedDamage+=100-enemy.Health;else openDamage+=100-enemy.Health;
+                }
+            }
+            Require(openDamage>mutedDamage*1.5f&&mutedDamage>0,"communication substantially improves ally duel contribution without disabling muted team");
+            Require(openCover>mutedCover*2,"communication improves living ally cover");
+            ally.Health=0;Require(g.Fps.TeamCover==0,"dead teammates provide no cover");
+            UnityEngine.Random.state=randomState;g.Night.Stress=savedStress;g.Night.MicOpen=savedMic;
             g.Fps.NewMatch();g.Fps.Intermission=0;
             var oldAim=g.Fps.Aim;g.Fps.Aim=new Vector2(0,0);int oldHits=g.Fps.Stats.Hits;Invoke(g.Fps,"Shoot");Require(g.Fps.Stats.Hits==oldHits,"miss does not award hit");g.Fps.Aim=oldAim;
             g.Fps.Ammo=0;g.Fps.Reload();Require(g.Fps.ReloadRemaining>0,"empty magazine reload starts");g.Fps.Tick(1.5f,false);Require(g.Fps.Ammo==24,"reload restores magazine");
