@@ -12,14 +12,14 @@ namespace TicosHouse
     {
         public const float NightSeconds = 1260f;
         public float Elapsed, Stress = 12, Noise, Suspicion;
-        public float FpsVolume = .65f;
+        public float FpsVolume = .45f;
         public bool MicOpen, MonitorOn = true, AtComputer, InBed, Internet = true;
         public bool BrotherPresent, DogPresent, Started, Paused;
         public int Pdl, Matches, Wins;
         public Ending Result;
         public TicoState Tico = TicoState.Sleeping;
         public float StateRemaining = 28, HuntRemaining, EventRemaining = 22;
-        public float BrotherRemaining, DogRemaining;
+        public float BrotherRemaining, DogRemaining, BrotherArrival;
         public bool FinalHunt { get { return !Internet; } }
         public float Communication { get { return Clamp((MicOpen ? 1.2f : .8f) - Stress / 500f, .55f, 1.2f); } }
         public float Difficulty { get { return Clamp(Elapsed / NightSeconds, 0, 1); } }
@@ -27,6 +27,7 @@ namespace TicosHouse
         public event Action<HouseCue, float> Sound;
         public event Action<string> Dialogue;
         public event Action<Ending> Finished;
+        public event Action<string> Effect;
         readonly Random random;
         float snoreTimer, stepTimer, shoutCooldown = 20, extremeExposure, heartbeat, mutedTime;
         bool checkedRoom;
@@ -163,16 +164,20 @@ namespace TicosHouse
         }
         void UpdateVisitors(float dt)
         {
+            if(BrotherArrival>0) {
+                float before=BrotherArrival;BrotherArrival-=dt;
+                if((int)before!=(int)BrotherArrival)Cue(HouseCue.Brother,1-BrotherArrival/10);
+                if(BrotherArrival<=0) {BrotherPresent=true;BrotherRemaining=Range(45,85);Say("Guilherme: calma, sou eu. Achou que era o Tico? Eu fico olhando.");}
+            }
             if (BrotherPresent) { BrotherRemaining -= dt; if (BrotherRemaining <= 0) { BrotherPresent = false; Say("Guilherme: vou dormir. Boa sorte aí."); Cue(HouseCue.Brother, .7f); } }
             if (DogPresent) { DogRemaining -= dt; if (DogRemaining <= 0) DogPresent = false; }
         }
         void RandomEvent()
         {
             int choice = random.Next(100);
-            if (choice < 15 && !BrotherPresent)
+            if (choice < 15 && !BrotherPresent && BrotherArrival<=0)
             {
-                Cue(HouseCue.Brother, .4f); BrotherPresent = true; BrotherRemaining = Range(45, 85);
-                Say("Guilherme: calma, sou eu. Achou que era o Tico? Eu fico olhando.");
+                Cue(HouseCue.Stair, .4f); BrotherArrival=7;
             }
             else if (choice < 29 && !DogPresent) { DogPresent = true; DogRemaining = 70; Cue(HouseCue.Door, .9f); }
             else if (choice < 38 && DogPresent) { Cue(HouseCue.Bark, .9f); AddNoise(28); }
@@ -181,7 +186,8 @@ namespace TicosHouse
             else if (choice < 66 && AtComputer) { Cue(HouseCue.Notification, 1); AddNoise(14); Say("Joaobuild entrou na chamada. Só mais uma, né?"); }
             else if (choice < 73 && AtComputer) { Stress = Clamp(Stress + 9, 0, 100); Say("Carlos: foi mal, tava olhando o outro monitor."); }
             else if (choice < 81 && AtComputer) { Stress = Clamp(Stress + 8, 0, 100); Say("Munhak: esse cara tá muito estranho, mano."); }
-            else if (choice < 88) { Cue(HouseCue.Creak, .95f); AddNoise(8); }
+            else if (choice < 85 && AtComputer) {Stress=Clamp(Stress+8,0,100);Say("A conexão engasgou. Dois segundos parecem eternos.");if(Effect!=null)Effect("lag");}
+            else if (choice < 91) { Cue(HouseCue.Creak, .95f); AddNoise(8);if(Effect!=null)Effect("flicker"); }
             else if (choice < 95 && BrotherPresent) Say("Guilherme: acho que ouvi ele... não, era a geladeira.");
             else { Cue(HouseCue.Knock, .3f); Say("Tico, ao longe: Gustavo?"); }
         }

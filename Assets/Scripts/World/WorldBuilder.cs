@@ -124,10 +124,16 @@ namespace TicosHouse
             Box("Hall left",new Vector3(.05f,1.5f,7),new Vector3(.15f,3.2f,6),wall,root);
             Box("Hall right",new Vector3(2.55f,1.5f,7),new Vector3(.15f,3.2f,6),wall,root);
             for(int i=0;i<8;i++) Box("Downstairs step",new Vector3(1.3f,-.2f-i*.23f,10+i*.45f),new Vector3(2.3f,.2f,.5f),wood,root);
-            Transform pivot = new GameObject("Door hinge").transform; pivot.SetParent(root); pivot.position=new Vector3(.43f,0,3.94f); game.Door=pivot;
-            Box("Bedroom door",new Vector3(.8f,1.24f,0),new Vector3(1.6f,2.43f,.09f),wood,pivot,false);
-            Shape("Brass handle",PrimitiveType.Sphere,new Vector3(1.38f,1.05f,-.10f),Vector3.one*.09f,Mat("Brass",new Color(.69f,.49f,.20f)),pivot);
-            Box("Light below door",new Vector3(1.23f,.025f,3.8f),new Vector3(1.55f,.012f,.10f),Mat("Amber glow",new Color(.85f,.51f,.20f),true),root,false);
+            Transform pivot = new GameObject("Door hinge").transform; pivot.SetParent(root); pivot.position=new Vector3(.46f,0,3.94f); game.Door=pivot;
+            Material doorMat=Mat("Door oak",new Color(.30f,.20f,.13f));
+            Box("Bedroom door",new Vector3(.84f,1.24f,0),new Vector3(1.68f,2.43f,.12f),doorMat,pivot,false);
+            for(int i=0;i<2;i++)Box("Raised oak panel",new Vector3(.84f,.67f+i*1.10f,-.078f),new Vector3(1.27f,.82f,.035f),wood,pivot,false);
+            Box("Door jamb left",new Vector3(.39f,1.27f,3.80f),new Vector3(.12f,2.55f,.16f),trim,root,false);
+            Box("Door jamb right",new Vector3(2.22f,1.27f,3.80f),new Vector3(.12f,2.55f,.16f),trim,root,false);
+            Box("Door jamb header",new Vector3(1.30f,2.55f,3.80f),new Vector3(1.95f,.13f,.16f),trim,root,false);
+            Box("Handle plate",new Vector3(1.48f,1.05f,-.08f),new Vector3(.08f,.23f,.025f),Mat("Brass",new Color(.69f,.49f,.20f)),pivot,false);
+            Box("Brass lever",new Vector3(1.39f,1.08f,-.14f),new Vector3(.23f,.04f,.06f),Mat("Brass",new Color(.69f,.49f,.20f)),pivot,false);
+            Lamp("Door spill",new Vector3(1.3f,.15f,3.60f),new Color(1,.59f,.28f),.22f,2,root).shadows=LightShadows.None;
             Lamp("Hall lamp",new Vector3(1.3f,2.6f,6.5f),new Color(1,.63f,.30f),1.1f,8,root);
             for(int s=-1;s<=1;s+=2) Box("Baseboard",new Vector3(s*3.88f,.1f,0),new Vector3(.04f,.2f,7.8f),trim,root,false);
             Box("Desk top",new Vector3(-1.5f,.82f,-2.6f),new Vector3(2.8f,.11f,.85f),wood,root);
@@ -157,19 +163,21 @@ namespace TicosHouse
             Box("Window cross",new Vector3(-3.79f,1.9f,.65f),new Vector3(.03f,.055f,1.88f),dark,root,false);
             for(int i=0;i<8;i++) Box("Blind slat",new Vector3(-3.73f,2.6f-i*.08f,.65f),new Vector3(.05f,.043f,2),wood,root,false);
             Box("Poster",new Vector3(-.7f,2.05f,-3.88f),new Vector3(1.22f,1.20f,.025f),dark,root,false);
-            Label("SÓ MAIS\nUMA.",new Vector3(-.7f,2.11f,-3.85f),.12f,new Color(.3f,.9f,.8f),root,0);
+            Label("SÓ MAIS\nUMA.",new Vector3(-.7f,2.11f,-3.85f),.12f,new Color(.3f,.9f,.8f),root,180);
             Box("Book shelf",new Vector3(-2.6f,2.3f,-3.63f),new Vector3(1.65f,.09f,.45f),wood,root,false);
             for(int i=0;i<7;i++) Box("Book",new Vector3(-3.2f+i*.16f,2.48f,-3.65f),new Vector3(.1f,.30f+(i%3)*.06f,.21f),Mat("Book"+i,Color.HSVToRGB(i*.12f,.42f,.46f)),root,false);
             Shape("Mug",PrimitiveType.Cylinder,new Vector3(-2.64f,1.01f,-2.6f),new Vector3(.16f,.13f,.16f),trim,root);
             Box("Rug",new Vector3(.1f,.01f,-.35f),new Vector3(2.6f,.01f,2.4f),Mat("Rug",new Color(.22f,.16f,.14f)),root,false);
             game.MonitorLight=Lamp("Monitor light",new Vector3(-1.5f,1.7f,-2.25f),new Color(.13f,.72f,1),1.6f,4.8f,root);
-            Lamp("Moonlight",new Vector3(-3.5f,2.4f,.5f),new Color(.22f,.38f,.68f),1.1f,7,root);
+            Lamp("Moonlight",new Vector3(-3.5f,2.4f,.5f),new Color(.22f,.38f,.68f),1.45f,8,root);
+            Lamp("Soft room fill",new Vector3(.5f,2.6f,.6f),new Color(.35f,.42f,.52f),.30f,7,root).shadows=LightShadows.None;
             Lamp("LED bounce",new Vector3(-1.3f,.55f,-3),new Color(.03f,.95f,.65f),.7f,3,root);
             game.TicoModel=Human("Tico",new Vector3(1.3f,0,6),true,false,root);
             game.TicoModel.localRotation=Quaternion.Euler(0,180,0); game.TicoModel.gameObject.SetActive(false);
             game.BrotherModel=Human("Guilherme",new Vector3(2.05f,0,2.95f),false,false,root); game.BrotherModel.localRotation=Quaternion.Euler(0,205,0);
             game.DogModel=Dog(new Vector3(.5f,0,.8f),root);
             game.GustModel=Human("Gust • suit and tie",new Vector3(-1.5f,-.4f,-1.63f),false,true,root);
+            game.GustModel.localRotation=Quaternion.Euler(0,180,0);
         }
         public static Transform Arena()
         {

@@ -11,6 +11,14 @@ public static class BuildGame
     {
         Directory.CreateDirectory("Assets/Scenes");
         Directory.CreateDirectory("Assets/Resources");
+        if(AssetDatabase.LoadAssetAtPath<Material>("Assets/Resources/PixelBackground.mat")==null)
+            AssetDatabase.CreateAsset(new Material(Shader.Find("Unlit/Texture")),"Assets/Resources/PixelBackground.mat");
+        if(AssetDatabase.LoadAssetAtPath<Material>("Assets/Resources/PixelAgent.mat")==null)
+            AssetDatabase.CreateAsset(new Material(Shader.Find("Unlit/Transparent")),"Assets/Resources/PixelAgent.mat");
+        foreach(string path in new[]{"Assets/Resources/Art/Ascent.png","Assets/Resources/Art/Agents.png"}){
+            var importer=AssetImporter.GetAtPath(path) as TextureImporter;
+            if(importer!=null){importer.filterMode=FilterMode.Point;importer.mipmapEnabled=false;importer.alphaIsTransparency=true;importer.npotScale=TextureImporterNPOTScale.None;importer.maxTextureSize=2048;importer.textureCompression=TextureImporterCompression.Uncompressed;importer.SaveAndReimport();}
+        }
         // An explicit material reference prevents Standard shader stripping in a procedural scene.
         if(AssetDatabase.LoadAssetAtPath<Material>("Assets/Resources/RuntimeStandard.mat")==null)
             AssetDatabase.CreateAsset(new Material(Shader.Find("Standard")),"Assets/Resources/RuntimeStandard.mat");
@@ -20,6 +28,7 @@ public static class BuildGame
         for(int i=0;i<shaders.arraySize;i++)if(shaders.GetArrayElementAtIndex(i).objectReferenceValue==Shader.Find("Standard"))hasStandard=true;
         if(!hasStandard){shaders.InsertArrayElementAtIndex(shaders.arraySize);shaders.GetArrayElementAtIndex(shaders.arraySize-1).objectReferenceValue=Shader.Find("Standard");graphics.ApplyModifiedProperties();}
         var scene=EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);
+        new GameObject("Tico's House Runtime").AddComponent<TicosHouse.GameRuntime>();
         EditorSceneManager.SaveScene(scene,"Assets/Scenes/Night.unity");
         EditorBuildSettings.scenes=new[]{new EditorBuildSettingsScene("Assets/Scenes/Night.unity",true)};
         PlayerSettings.companyName="Joaobuild";PlayerSettings.productName="Tico's House";
@@ -30,7 +39,8 @@ public static class BuildGame
         PlayerSettings.SetApiCompatibilityLevel(UnityEditor.Build.NamedBuildTarget.Standalone,ApiCompatibilityLevel.NET_Standard);
         QualitySettings.shadows=ShadowQuality.All;QualitySettings.shadowResolution=ShadowResolution.Medium;QualitySettings.shadowDistance=28;
         AssetDatabase.SaveAssets();
-        var report=BuildPipeline.BuildPlayer(new BuildPlayerOptions {scenes=new[]{"Assets/Scenes/Night.unity"},locationPathName="Builds/TicosHouse/TicosHouse.exe",target=BuildTarget.StandaloneWindows64,options=BuildOptions.None});
+        string output=System.Array.IndexOf(System.Environment.GetCommandLineArgs(),"--qa-output")>=0?"Builds/QA/TicosHouse.exe":"Builds/TicosHouse/TicosHouse.exe";
+        var report=BuildPipeline.BuildPlayer(new BuildPlayerOptions {scenes=new[]{"Assets/Scenes/Night.unity"},locationPathName=output,target=BuildTarget.StandaloneWindows64,options=BuildOptions.None});
         if(report.summary.result!=BuildResult.Succeeded)throw new System.Exception("Build failed: "+report.summary.result);
         Debug.Log("TICOS_BUILD_SUCCESS "+report.summary.totalSize);
     }

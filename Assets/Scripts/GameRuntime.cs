@@ -13,10 +13,11 @@ namespace TicosHouse
         public Renderer Screen;
         public Light MonitorLight;
         public float Sensitivity=2.0f;
+        public bool TestingFrozen;
         public Camera RoomCamera;
         CharacterController player;
         float yaw=195,pitch=9, subtitleTime, scareTime, footTimer, notificationTime, flicker;
-        float savedVolume=.65f, flickerRemaining;
+        float savedVolume=.45f, flickerRemaining;
         string subtitle="",notification="";
         bool showHelp,endingSaved;
         Material screenMat;
@@ -25,6 +26,7 @@ namespace TicosHouse
         Color teal=new Color(.22f,.88f,.77f), amber=new Color(1,.68f,.32f), pale=new Color(.86f,.90f,.90f), red=new Color(1,.32f,.27f);
         Vector3 seat=new Vector3(-1.5f,0,-1.68f),bed=new Vector3(2.8f,0,-2.30f);
         public bool ComputerView { get {return Night.AtComputer&&Night.MonitorOn&&Night.Started&&Night.Result==Ending.None;} }
+        public bool ComputerLobby { get {return ComputerView&&(!Fps.Active||Fps.MatchOver);} }
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void Boot() { if(FindFirstObjectByType<GameRuntime>()==null)new GameObject("Tico's House").AddComponent<GameRuntime>(); }
         void Awake()
@@ -38,8 +40,9 @@ namespace TicosHouse
             player=p.AddComponent<CharacterController>();player.height=1.75f;player.center=Vector3.up*.875f;player.radius=.24f;player.stepOffset=.22f;
             var c=new GameObject("House ears and eyes");c.transform.SetParent(p.transform,false);c.transform.localPosition=Vector3.up*1.65f;
             RoomCamera=c.AddComponent<Camera>();RoomCamera.nearClipPlane=.06f;RoomCamera.farClipPlane=70;RoomCamera.fieldOfView=72;
+            RoomCamera.cullingMask=~(1<<8);
             RoomCamera.clearFlags=CameraClearFlags.SolidColor;RoomCamera.backgroundColor=new Color(.01f,.018f,.03f);c.AddComponent<AudioListener>();
-            Audio=gameObject.AddComponent<ProceduralAudio>();Audio.Listener=c.transform;
+            Audio=gameObject.AddComponent<ProceduralAudio>();Audio.Listener=c.transform;Audio.MasterVolume=PlayerPrefs.GetFloat("MasterVolume",.65f);
             Night.Sound+=Audio.House;Night.Dialogue+=Speak;Night.Finished+=OnFinish;
             Night.Effect+=effect=>{if(effect=="lag"&&Fps!=null)Fps.LagRemaining=2.3f;else flickerRemaining=1.2f;};
             WorldBuilder.Room(this);
@@ -47,6 +50,7 @@ namespace TicosHouse
             screenMat=Screen.material;screenMat.mainTexture=Fps.Texture;screenMat.SetTexture("_EmissionMap",Fps.Texture);screenMat.SetColor("_EmissionColor",Color.white*.65f);
             Cursor.lockState=CursorLockMode.None;Cursor.visible=true;
             StartCoroutine(Automation());
+            if(System.Array.IndexOf(System.Environment.GetCommandLineArgs(),"--qa-test")>=0)gameObject.AddComponent<RuntimeValidation>();
         }
         void Speak(string s){subtitle=s;subtitleTime=6;if(Audio!=null)Audio.Speech(s);}
         void OnFinish(Ending ending)
@@ -67,13 +71,13 @@ namespace TicosHouse
             if(Input.GetKeyDown(KeyCode.Escape)&&Night.Started&&Night.Result==Ending.None) {
                 Night.Paused=!Night.Paused; Cursor.lockState=Night.Paused?CursorLockMode.None:CursorLockMode.Locked;Cursor.visible=Night.Paused;
             }
-            Audio.Quiet=Night.Paused;
+            SyncCursor();Audio.Quiet=Night.Paused;
             if(Night.Paused)return;
             subtitleTime-=dt;notificationTime-=dt;
-            if(Night.Started&&Night.Result==Ending.None) {
+            if(!TestingFrozen&&Night.Started&&Night.Result==Ending.None) {
                 InputNight(dt); Night.Tick(dt);Fps.Tick(dt,ComputerView);
             }
-            Audio.FpsVolume=Night.FpsVolume;Audio.Online=Night.Internet;
+            Audio.FpsVolume=Night.FpsVolume;Audio.Online=Night.Internet;Audio.WearingHeadphones=Night.AtComputer&&Night.MonitorOn;
             flickerRemaining-=dt;MonitorLight.enabled=Night.MonitorOn&&(flickerRemaining<=0||Mathf.Sin(Time.time*70)>0);
             screenMat.SetColor("_EmissionColor",Night.MonitorOn?Color.white*.65f:Color.black);
             screenMat.color=Night.MonitorOn?Color.white:Color.black;
@@ -89,6 +93,18 @@ namespace TicosHouse
                 RoomCamera.transform.localRotation*=Quaternion.Euler(Mathf.Sin(Time.time*84)*1.8f,Mathf.Cos(Time.time*61)*1.6f,0);
                 MonitorLight.enabled=true;MonitorLight.color=red;MonitorLight.intensity=4;
             }
+            SyncCursor();
+        }
+        void SyncCursor()
+        {
+            bool free=!Night.Started||Night.Paused||Night.Result!=Ending.None||ComputerLobby;
+            CursorLockMode mode=free?CursorLockMode.None:CursorLockMode.Locked;
+            if(Cursor.lockState!=mode)Cursor.lockState=mode;
+            Cursor.visible=free;
+        }
+        void OnApplicationFocus(bool focused)
+        {
+            if(!focused&&Night!=null&&Night.Started&&Night.Result==Ending.None&&!TestingFrozen){Night.Paused=true;Cursor.lockState=CursorLockMode.None;Cursor.visible=true;}
         }
         void InputNight(float dt)
         {
@@ -114,7 +130,7 @@ namespace TicosHouse
                 RoomCamera.transform.localPosition=new Vector3(0,1.65f+Mathf.Sin(Time.time*speed*3)*.015f*direction.magnitude,0);
             }
             if(Night.AtComputer) {
-                RoomCamera.transform.localPosition=Vector3.Lerp(RoomCamera.transform.localPosition,new Vector3(0,1.40f,-.20f),dt*6);
+                RoomCamera.transform.localPosition=Vector3.Lerp(RoomCamera.transform.localPosition,new Vector3(0,1.40f,.32f),dt*6);
                 player.transform.rotation=Quaternion.Euler(0,180,0);RoomCamera.transform.localRotation=Quaternion.identity;
             }
             if(Night.InBed) {
@@ -233,22 +249,23 @@ namespace TicosHouse
         void Help(float x,float y)
         {
             Txt(x,y,495,36,"HABILIDADE → TEMPO → RISCO",text,teal);
-            Txt(x,y+46,495,255,"WASD / mouse   Andar e olhar\nE   Sentar, levantar, deitar ou fazer carinho\nF   Ligar / desligar monitor perto da mesa\nEnter   Buscar partida no computador\nMouse 1   Atirar     R   Recarregar\nQ   Pulso tático     Shift   Andar devagar no FPS\nTAB   Placar     M   Microfone fictício\nV   Mutar FPS     − / + ou Alt + roda   Volume\n\nOuviu passos? Desligue, levante e vá à cama.\nEspere o ronco voltar. O silêncio não garante nada.\nWi-Fi cortado é derrota, mesmo na cama.",small);
+            Txt(x,y+46,495,255,"WASD / mouse   Andar e olhar no quarto\nE   Sentar, levantar, deitar ou fazer carinho\nF   Ligar / desligar monitor perto da mesa\nEnter   Buscar partida no computador\nMouse   Mover a mira na Ascent (câmera fixa)\nMouse 1   Atirar     R   Recarregar     Q   Pulso\nTAB   Placar     M   Microfone fictício\nV   Mutar FPS     − / + ou Alt + roda   Volume\n\nOuviu passos? Desligue, levante e vá à cama.\nEspere o ronco voltar. O silêncio não garante nada.\nWi-Fi cortado é derrota, mesmo na cama.",small);
         }
         void Options()
         {
             Txt(70,62,500,60,"PAUSA",heading);Help(70,145);
             Txt(690,140,430,30,"Sensibilidade do mouse",text);Sensitivity=GUI.HorizontalSlider(new Rect(690,185,400,20),Sensitivity,.4f,5);
             Txt(690,222,400,30,"Volume do FPS: "+Mathf.RoundToInt(Night.FpsVolume*100)+"%",text);Night.FpsVolume=GUI.HorizontalSlider(new Rect(690,267,400,20),Night.FpsVolume,0,1);
-            if(Button(690,340,400,"VOLTAR À NOITE")){Night.Paused=false;Cursor.lockState=CursorLockMode.Locked;Cursor.visible=false;PlayerPrefs.SetFloat("Sensitivity",Sensitivity);}
+            Txt(690,285,400,28,"Volume geral: "+Mathf.RoundToInt(Audio.MasterVolume*100)+"%",small);Audio.MasterVolume=GUI.HorizontalSlider(new Rect(690,318,400,16),Audio.MasterVolume,0,1);
+            if(Button(690,340,400,"VOLTAR À NOITE")){Night.Paused=false;Cursor.lockState=CursorLockMode.Locked;Cursor.visible=false;PlayerPrefs.SetFloat("Sensitivity",Sensitivity);PlayerPrefs.SetFloat("MasterVolume",Audio.MasterVolume);PlayerPrefs.Save();}
             if(Button(690,405,400,"RECOMEÇAR"))Restart();
             if(Button(690,470,400,"SAIR"))Application.Quit();
         }
         void Computer()
         {
             Panel(32,87,1216,565,new Color(.027f,.043f,.063f,.99f));
-            GUI.DrawTexture(new Rect(49,132,963,516),Fps.Texture,ScaleMode.ScaleAndCrop);
-            Panel(49,99,963,33,new Color(.035f,.058f,.077f));Txt(64,104,300,26,"NULL // SHIFT    /    RELAY",small,teal);
+            GUI.DrawTexture(new Rect(49,132,963,516),Fps.Texture,ScaleMode.StretchToFill);
+            Panel(49,99,963,33,new Color(.035f,.058f,.077f));Txt(64,104,355,26,"ASCENT    /    MIRA LIVRE • CÂMERA FIXA",small,teal);
             Txt(470,99,260,35,Fps.Blue+"   :   "+Fps.Red,heading);Txt(800,107,205,25,"PRIMEIRO A 13",small);
             Panel(1027,99,203,549,new Color(.026f,.035f,.049f));Txt(1043,110,174,32,"CHAMADA",text,teal);
             Txt(1043,151,178,40,Night.Internet?"●  conectado":"○  sem internet",small,Night.Internet?teal:red);
@@ -260,14 +277,16 @@ namespace TicosHouse
                 Panel(49,132,963,516,new Color(.018f,.027f,.04f,.88f));
                 Txt(200,223,740,65,Fps.MatchOver?(Fps.LastWin?"VITÓRIA":"DERROTA"):"A FILA CHAMOU.",heading,teal);
                 Txt(200,303,740,45,Fps.MatchOver?Fps.RatingDetails:"Gust + quatro amigos. Elimine o time adversário.",text);
-                Txt(200,358,700,80,"Elimine os cinco ou tenha mais sobreviventes em 27s.\nSua mira decide o PDL. O Tico decide a duração da noite.",text);
-                Txt(200,494,720,52,"ENTER   BUSCAR PARTIDA",heading,amber);
+                Txt(200,358,700,80,"Só a mira se move. Os inimigos fazem AD–AD.\nElimine os cinco ou tenha mais sobreviventes em 18s.",text);
+                if(Button(200,486,530,"BUSCAR PARTIDA   →")){Fps.NewMatch();SyncCursor();}
+                Txt(200,545,700,32,"Clique no botão ou pressione ENTER",small,amber);
             }
             else {
                 Txt(64,590,190,45,"HP  "+Fps.Health,heading,Fps.Health<30?red:pale);
                 Txt(790,590,215,45,Fps.ReloadRemaining>0?"RECARGA":Fps.Ammo+" / 24",heading);
                 Txt(64,554,220,30,"Q  PULSO TÁTICO",small,teal);
-                if(!Fps.PlayerDead&&Fps.Intermission<=0){float cx=530.5f,cy=390;Color cc=Fps.HitFlash>0?red:teal;Panel(cx-11,cy,7,2,cc);Panel(cx+5,cy,7,2,cc);Panel(cx,cy-11,2,7,cc);Panel(cx,cy+5,2,7,cc);}
+                if(!Fps.PlayerDead&&Fps.Intermission<=0){float cx=49+Fps.Aim.x/960*963,cy=132+Fps.Aim.y/540*516;Color cc=Fps.HitFlash>0?red:teal;Panel(cx-9,cy,5,2,cc);Panel(cx+5,cy,5,2,cc);Panel(cx,cy-9,2,5,cc);Panel(cx,cy+5,2,5,cc);}
+                if(Fps.MuzzleFlash>0){Panel(651,450,12,17,new Color(1,.77f,.24f,.7f));Panel(644,457,25,4,new Color(1,.92f,.5f,.8f));}
                 if(Fps.FeedTime>0)Txt(660,153,340,33,Fps.KillFeed,small,teal);
                 if(Fps.BannerTime>0||Fps.Intermission>0)Txt(250,194,560,50,Fps.Banner,center,amber);
                 if(Fps.PlayerDead)Txt(245,373,570,55,"VOCÊ CAIU  •  O TIME CONTINUA",center,red);
@@ -309,10 +328,10 @@ namespace TicosHouse
             if(System.Array.IndexOf(args,"--smoke-test")<0)yield break;
             yield return null;StartNight();Night.AtComputer=true;Teleport(seat);Fps.NewMatch();
             yield return new WaitForSeconds(4);
-            Debug.Assert(Fps.Bots.Count==9,"Nine bots required");Debug.Assert(Night.Pdl==0,"Starting PDL");
+            if(Fps.Bots.Count!=9||Night.Pdl!=0){Debug.LogError("TICOS_SMOKE_FAIL: initialization");Application.Quit(1);yield break;}
             Night.BeginFinalHunt();Night.InBed=true;Night.MonitorOn=false;
             for(int i=0;i<2200;i++)Night.Tick(.01f);
-            Debug.Assert(Night.Result==Ending.Wifi,"Final hunt cannot be escaped");
+            if(Night.Result!=Ending.Wifi){Debug.LogError("TICOS_SMOKE_FAIL: hunt escaped");Application.Quit(1);yield break;}
             Debug.Log("TICOS_SMOKE_PASS");Application.Quit(0);
         }
         void OnDestroy(){if(screenMat!=null)Destroy(screenMat);if(pixel!=null)Destroy(pixel);}
