@@ -2,7 +2,7 @@
 
 Terror com comédia em primeira pessoa: Gustavo prometeu desligar o computador às 21h, mas entrou em mais uma partida com os amigos. O quarto, o FPS e a casa continuam funcionando ao mesmo tempo.
 
-**Versão 0.1.3 — Windows x64.**
+**Versão 0.1.4 — Windows x64.**
 
 ## Objetivo
 
@@ -26,7 +26,7 @@ Sair de **Platina 3 — 0 PDL** e alcançar **100 PDL / Diamante** antes das 06h
 
 Use fones. Aproxime-se da cadeira e pressione E para sentar. O cursor fica livre: clique no botão **Buscar partida** ou pressione Enter. Durante o combate, o mouse move a mira sobre a imagem fixa da Ascent. Jogue bem para ganhar mais PDL, mas escute o ronco e a casa. Ao suspeitar de uma visita, desligue o monitor, levante, caminhe até a cama e deite. Espere sinais sonoros de que é seguro levantar: passos que se afastam podem ser falsos. Sair da janela pausa a noite automaticamente.
 
-A partida continua enquanto você se esconde; ficar ausente pode custar rounds. O relógio vai de 21h a 06h em 21 minutos reais, sem contar pausas. Na Ascent, apenas a mira se move; os inimigos fazem AD–AD. Cada round dura até 18 segundos e termina por eliminação ou limite de tempo; no limite, vence a equipe com mais sobreviventes (empates são desempates simulados).
+A partida continua enquanto você se esconde; ficar ausente pode custar rounds. O relógio vai de 21h a 06h em 21 minutos reais, sem contar pausas. Na Ascent, apenas a mira se move; os inimigos fazem AD–AD. Cada round dura até 18 segundos e termina por eliminação ou limite de tempo; no limite, Gust perde se ainda houver defensores vivos.
 
 ## Controles
 
@@ -52,7 +52,7 @@ O jogo não acessa seu microfone, Discord ou roteador reais. Toda comunicação 
 
 ## Download
 
-Baixe em [Tico's House v0.1.3](https://github.com/joaobuild/Ticos-House/releases/tag/v0.1.3). Extraia a pasta inteira e abra `TicosHouse.exe`. Não é necessário instalar Unity.
+Baixe em [Tico's House v0.1.4](https://github.com/joaobuild/Ticos-House/releases/tag/v0.1.4). Extraia a pasta inteira e abra `TicosHouse.exe`. Não é necessário instalar Unity.
 
 ## Desenvolvimento
 
@@ -101,3 +101,8 @@ Inimigos fazem arrancadas e mudanças aleatórias de direção, com pausas curta
 ### Combate e comunicação 0.1.3
 
 Inimigos entram a cada 0,65 s e atiram a cada 0,32–0,56 s após o tempo inicial de reação. Acertos podem ser headshots (22% dos acertos; 75–95 de dano) ou tiros no corpo (26–36). Gust continua com 150 HP. Comunicação e estresse afetam a cadência e precisão dos aliados; aliados vivos oferecem cobertura, dividindo o foco inimigo. Acertos aliados suprimem a precisão do alvo por 0,65 s. Mortos não oferecem cobertura. Mutado ainda é possível vencer, mas o time ajuda significativamente menos.
+
+
+### Regras atuais — 0.1.4
+
+Gust e aliados precisam eliminar os cinco inimigos em 18 segundos. Não basta sobreviver com vantagem numérica. Três inimigos entram juntos; os outros entram logo depois. Cada kill troca o cenário imediatamente, mas NÃO pausa o combate nem reinicia os tiros inimigos. Tiros a cada 0,22–0,38 s; corpo 30–44, headshot 100–125 (30% dos acertos). Vida do Gust permanece 150. Comunicação, cobertura e supressão aliada continuam essenciais para aliviar a pressão.

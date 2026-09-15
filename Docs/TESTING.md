@@ -58,3 +58,9 @@ Build Windows validada com 34 verificações automatizadas (TICOS_QA_PASS): 150 
 Cobertura nova: amostra determinística de 100 disparos para verificar headshots, tiros no corpo e cadência; 300 ações aliadas por modo, com a mesma seed, comparando contribuição mutada e comunicação aberta. Verifica cobertura maior com comunicação e ausência de cobertura quando o aliado morre. Esses testes verificam o efeito mecânico, não equivalem a playtest humano de dificuldade.
 
 Resultado: 42 verificações do player aprovadas (TICOS_QA_PASS).
+
+## Regressão 0.1.4
+
+Testes específicos: transição preserva cooldown inimigo; relógio e dano continuam após mudança; três inimigos simultâneos; vantagem numérica sem eliminar defensores não concede vitória por tempo. Atualizados limites da cadência. Mudança motivada por duas facilidades reais identificadas no código: pausa global e reset do cooldown após cada kill, e vitória passiva por número de sobreviventes.
+
+Resultado final 0.1.4: 44 verificações aprovadas, incluindo restart (TICOS_QA_PASS).

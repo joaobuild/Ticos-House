@@ -55,8 +55,8 @@ namespace TicosHouse
             g.Fps.NewMatch();Invoke(g,"SyncCursor");Require(!g.ComputerLobby&&(!Application.isFocused||Cursor.lockState==CursorLockMode.Locked),"match selects free-aim input mode");
             g.Fps.Intermission=0;Require(g.Fps.Bots.Count==9,"four allies and five enemies");
             Require(g.Fps.Bots.Where(b=>b.Ally).Select(b=>b.Name).Distinct().Count()==4,"unique randomized friend team");
-            g.Fps.Tick(.8f,false);yield return Capture("03-computer");
             Require(g.Fps.Health==150,"Gust starts with 150 health");
+            g.Fps.Tick(.8f,false);yield return Capture("03-computer");
             Require(Resources.Load<Texture2D>("Art/AscentBombA")!=null&&Resources.Load<Texture2D>("Art/AscentMid")!=null,"additional Ascent backgrounds included");
             var enemy=g.Fps.Bots.First(b=>!b.Ally);
             Require(g.Fps.ScenarioCount==5&&Resources.Load<Texture2D>("Art/AscentBombB")!=null&&Resources.Load<Texture2D>("Art/AscentTree")!=null,"five Ascent viewpoints loaded");
@@ -75,8 +75,10 @@ namespace TicosHouse
             g.Fps.Health=117;int previousScenario=g.Fps.Scenario;
             Invoke(g.Fps,"Shoot");Require(g.Fps.Stats.Headshots==1&&g.Fps.Stats.Kills==1,"pixel head hitbox kill");
             Require(g.Fps.Scenario!=previousScenario&&g.Fps.Health==117&&g.Fps.RoundKills==1,"kill changes viewpoint without healing or resetting round stats");
-            Require(g.Fps.TransitionRemaining>0,"viewpoint change grants reaction time");
-            g.Fps.Tick(.2f,false);Require(g.Fps.Health==117&&g.Fps.TransitionRemaining>0,"no damage during viewpoint transition");
+            var attacker=g.Fps.Bots.First(b=>!b.Ally&&b!=enemy);attacker.Health=100;attacker.Skill=1;attacker.SpawnAt=0;attacker.Cooldown=.01f;
+            Invoke(g.Fps,"AdvanceScenario");Require(attacker.Cooldown==.01f,"kill transition preserves enemy attack cooldown");
+            float beforeTransitionTime=g.Fps.RoundTime;g.Fps.Tick(.02f,false);
+            Require(g.Fps.Health<117&&g.Fps.RoundTime>beforeTransitionTime,"enemy attacks and clock continue during viewpoint changes");
             for(int view=0;view<g.Fps.ScenarioCount;view++){
                 Invoke(g.Fps,"AdvanceScenario");g.Fps.Cam.Render();RenderTexture previous=RenderTexture.active;RenderTexture.active=g.Fps.Texture;
                 var capture=new Texture2D(g.Fps.Texture.width,g.Fps.Texture.height,TextureFormat.RGB24,false);capture.ReadPixels(new Rect(0,0,capture.width,capture.height),0,0);capture.Apply();
@@ -99,10 +101,10 @@ namespace TicosHouse
                 g.Fps.Health=150;g.Fps.PlayerDead=false;enemy.Cooldown=0;
                 Invoke(g.Fps,"UpdateBot",enemy,.01f); // restore live round after prior death
                 if(g.Fps.Intermission>0){g.Fps.Intermission=0;burst--;continue;}
-                rapidFire&=enemy.Cooldown>=.32f&&enemy.Cooldown<=.56f;
+                rapidFire&=enemy.Cooldown>=.22f&&enemy.Cooldown<=.38f;
             }
             Require(g.Fps.EnemyHeadshots>headshotsBefore&&g.Fps.EnemyHeadshots<headshotsBefore+100,"enemy fire includes headshots and body shots");
-            Require(rapidFire,"enemy cadence is 0.32 to 0.56 seconds");
+            Require(rapidFire,"enemy cadence is 0.22 to 0.38 seconds");
             UnityEngine.Random.state=randomState;
             g.Fps.NewMatch();g.Fps.Intermission=0;
             var ally=g.Fps.Bots.First(b=>b.Ally);enemy=g.Fps.Bots.First(b=>!b.Ally);
@@ -122,6 +124,11 @@ namespace TicosHouse
             Require(openCover>mutedCover*2,"communication improves living ally cover");
             ally.Health=0;Require(g.Fps.TeamCover==0,"dead teammates provide no cover");
             UnityEngine.Random.state=randomState;g.Night.Stress=savedStress;g.Night.MicOpen=savedMic;
+            g.Fps.NewMatch();g.Fps.Intermission=0;g.Fps.RoundTime=.36f;
+            Require(g.Fps.Bots.Count(b=>g.Fps.Visible(b))==3,"three enemies enter together");
+            foreach(var b in g.Fps.Bots)b.Cooldown=999;
+            g.Fps.RoundTime=18;g.Fps.Tick(.01f,false);
+            Require(g.Fps.Red==1&&g.Fps.Blue==0,"waiting with numerical advantage cannot win the objective");
             g.Fps.NewMatch();g.Fps.Intermission=0;
             var oldAim=g.Fps.Aim;g.Fps.Aim=new Vector2(0,0);int oldHits=g.Fps.Stats.Hits;Invoke(g.Fps,"Shoot");Require(g.Fps.Stats.Hits==oldHits,"miss does not award hit");g.Fps.Aim=oldAim;
             g.Fps.Ammo=0;g.Fps.Reload();Require(g.Fps.ReloadRemaining>0,"empty magazine reload starts");g.Fps.Tick(1.5f,false);Require(g.Fps.Ammo==24,"reload restores magazine");

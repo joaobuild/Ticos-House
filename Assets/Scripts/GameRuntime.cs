@@ -278,7 +278,7 @@ namespace TicosHouse
                 Panel(49,132,963,516,new Color(.018f,.027f,.04f,.88f));
                 Txt(200,223,740,65,Fps.MatchOver?(Fps.LastWin?"VITÓRIA":"DERROTA"):"A FILA CHAMOU.",heading,teal);
                 Txt(200,303,740,45,Fps.MatchOver?Fps.RatingDetails:"Gust + quatro amigos. Elimine o time adversário.",text);
-                Txt(200,358,700,80,"Só a mira se move. Os inimigos fazem AD–AD.\nElimine os cinco ou tenha mais sobreviventes em 18s.",text);
+                Txt(200,358,700,80,"Só a mira se move. Os inimigos fazem AD–AD.\nElimine os cinco em 18s. Tempo esgotado = derrota.",text);
                 if(Button(200,486,530,"BUSCAR PARTIDA   →")){Fps.NewMatch();SyncCursor();}
                 Txt(200,545,700,32,"Clique no botão ou pressione ENTER",small,amber);
             }

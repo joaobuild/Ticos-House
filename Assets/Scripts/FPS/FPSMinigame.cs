@@ -71,8 +71,8 @@ namespace TicosHouse
         void NewRound()
         {
             Health=MaxHealth;Ammo=24;RoundTime=0;RoundKills=0;PlayerDead=false;ReloadRemaining=0;FlashRemaining=0;abilityCooldown=0;Aim=new Vector2(480,270);TransitionRemaining=0;fireTime=0;DamageFlash=HitFlash=MuzzleFlash=EnemyHeadshotFlash=0;EnemyHeadshots=0;
-            int e=0;foreach(var b in Bots){b.Health=100;b.DamagedByPlayer=false;b.Cooldown=Random.Range(.85f,1.3f);b.Phase=Random.Range(0,6.28f);
-                b.SpawnAt=b.Ally?0:e++*.65f+.5f;b.Height=b.Agent%2==0?122:108;b.Suppressed=0;
+            int e=0;foreach(var b in Bots){b.Health=100;b.DamagedByPlayer=false;b.Cooldown=Random.Range(.45f,.7f);b.Phase=Random.Range(0,6.28f);
+                b.SpawnAt=b.Ally?0:.35f+Mathf.Max(0,e++-2)*.55f;b.Height=b.Agent%2==0?122:108;b.Suppressed=0;
                 b.Offset=Random.Range(-38f,38f);b.DecisionRemaining=0;b.Direction=Random.value<.5f?-1:1;
                 b.ShotFlash=0;if(!b.Ally){PlaceEnemy(b);b.Model.gameObject.SetActive(false);}
             }
@@ -105,8 +105,9 @@ namespace TicosHouse
         }
         void AdvanceScenario()
         {
-            Scenario=(Scenario+1)%backgrounds.Length;backgroundMaterial.mainTexture=backgrounds[Scenario];TransitionRemaining=.65f;
-            foreach(var b in Bots){b.ShotFlash=0;b.Cooldown=Mathf.Max(b.Cooldown,1.15f);b.Offset=Random.Range(-38f,38f);b.DecisionRemaining=0;if(!b.Ally)PlaceEnemy(b);}
+            Scenario=(Scenario+1)%backgrounds.Length;backgroundMaterial.mainTexture=backgrounds[Scenario];TransitionRemaining=.15f;
+            // Changing artwork must never reset enemy attacks or grant chained invulnerability.
+            foreach(var b in Bots){b.ShotFlash=0;b.Offset=Random.Range(-38f,38f);b.DecisionRemaining=0;if(!b.Ally)PlaceEnemy(b);}
             Banner="ASCENT • "+LocationName;BannerTime=1.2f;
         }
         public void Tick(float dt,bool controls)
@@ -116,7 +117,7 @@ namespace TicosHouse
             EnemyHeadshotFlash=Mathf.Max(0,EnemyHeadshotFlash-dt);
             foreach(var b in Bots){b.ShotFlash=Mathf.Max(0,b.ShotFlash-dt);b.Suppressed=Mathf.Max(0,b.Suppressed-dt);}
             if(Intermission>0){Intermission-=dt;if(Intermission<=0)NewRound();return;}
-            if(TransitionRemaining>0){TransitionRemaining=Mathf.Max(0,TransitionRemaining-dt);return;}
+            TransitionRemaining=Mathf.Max(0,TransitionRemaining-dt);
             RoundTime+=dt;fireTime-=dt;abilityCooldown-=dt;FlashRemaining-=dt;LagRemaining=Mathf.Max(0,LagRemaining-dt);
             if(ReloadRemaining>0){ReloadRemaining-=dt;if(ReloadRemaining<=0)Ammo=24;}
             if(controls&&!PlayerDead)Control();
@@ -129,7 +130,7 @@ namespace TicosHouse
             }
             int allies=Bots.Count(b=>b.Ally&&b.Alive)+(PlayerDead?0:1),enemies=Bots.Count(b=>!b.Ally&&b.Alive);
             if(enemies==0)EndRound(true);else if(allies==0)EndRound(false);
-            else if(RoundTime>18)EndRound(allies>enemies||(allies==enemies&&Random.value<.5f));
+            else if(RoundTime>18)EndRound(false); // Gust's team attacks: surviving defenders deny the objective.
         }
         void Control()
         {
@@ -157,7 +158,7 @@ namespace TicosHouse
         void UpdateBot(Combatant b,float dt)
         {
             if(!b.Ally&&!Visible(b))return;
-            b.Cooldown-=dt;if(b.Cooldown>0)return;b.Cooldown=b.Ally?Random.Range(1.05f,1.5f)*Mathf.Lerp(2f,1f,Coordination):Random.Range(.32f,.56f);
+            b.Cooldown-=dt;if(b.Cooldown>0)return;b.Cooldown=b.Ally?Random.Range(1.05f,1.5f)*Mathf.Lerp(2f,1f,Coordination):Random.Range(.22f,.38f);
             if(b.Ally){
                 var enemies=Bots.Where(Visible).ToArray();if(enemies.Length==0)return;
                 var target=enemies[Random.Range(0,enemies.Length)];
@@ -171,7 +172,7 @@ namespace TicosHouse
                 b.ShotFlash=.18f;b.AimedAtPlayer=aimPlayer;
                 float chance=b.Skill*(FlashRemaining>0?.12f:1)*(b.Suppressed>0?.55f:1);
                 if(Random.value<chance){
-                    bool headshot=Random.value<.22f;int damage=headshot?Random.Range(75,96):Random.Range(26,37);
+                    bool headshot=Random.value<.30f;int damage=headshot?Random.Range(100,126):Random.Range(30,45);
                     if(aimPlayer){if(headshot){EnemyHeadshots++;EnemyHeadshotFlash=.65f;}Health-=damage;DamageFlash=.23f;if(Health<=0){Health=0;PlayerDead=true;Stats.Deaths++;if(RoundTime<7)Stats.EarlyDeaths++;Game.Night.Stress=Mathf.Min(100,Game.Night.Stress+6);b.Kills++;Banner=headshot?"VOCÊ CAIU — HEADSHOT":"VOCÊ CAIU - o time continua";BannerTime=3;}}
                     else if(friends.Length>0){var target=friends[Random.Range(0,friends.Length)];target.Health-=damage;if(target.Health<=0)Kill(target,b);}
                 }

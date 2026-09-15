@@ -1,59 +1,26 @@
-# Tico's House v0.1.3 — Windows x64
+# Tico's House v0.1.4 — Windows x64
 
-Primeira versão jogável do terror com comédia do Gust. Objetivo: sair de Platina 3 — 0 PDL e alcançar Diamante antes das 06h sem Tico descobrir.
+## Dificuldade corrigida
 
-## Incluído
+- Cada kill muda o enquadramento, mas não pausa mais o combate nem reinicia o tempo dos tiros inimigos. Eliminada a proteção renovável por kills em sequência.
+- É necessário eliminar os cinco defensores em 18 segundos. Tempo esgotado com inimigo vivo significa derrota, mesmo com vantagem numérica.
+- Três inimigos entram juntos. Os demais chegam logo depois.
+- Tiros inimigos a cada 0,22–0,38 s após a reação inicial. Corpo: 30–44 de dano. Headshot: 100–125 (30% dos acertos). Gust mantém 150 HP.
+- Comunicação melhora a atuação dos aliados. Aliados vivos dividem o fogo inimigo e seus acertos reduzem temporariamente a precisão do alvo.
+- Mantidos cinco enquadramentos pixelados da Ascent, AD–AD variável, headshots do Gust, rounds até 13 e PDL por desempenho.
 
-- Quarto 3D, computador, monitor desligável, cama e movimentação em primeira pessoa.
-- Minijogo exclusivamente na **Ascent**, com cenário pixelado fixo, mira livre e sprites de Jett, Phoenix, Sage, Reyna e Omen fazendo AD–AD. Sem movimentação do jogador no mapa, conforme a revisão solicitada.
-- Tiros, headshots, recarga, pulso, dano, quatro amigos sorteados, rounds até 13 e placar.
-- PDL por desempenho, comunicação, microfone fictício, volume independente, estresse e barulho.
-- Tico com suspeita invisível, ronco, passos, inspeção, falsa saída e jumpscare sem violência gráfica.
-- Guilherme, Meliça, falsos alarmes, carinho e eventos.
-- Corte de Wi-Fi irreversível e cinco finais.
-- Mixagem revisada: picos menores, menos ruído agudo, tiros limitados e volume geral ajustável.
-- Cursor livre no lobby, botão Buscar partida clicável e pausa automática ao sair da janela.
+## Como abrir
 
-## Executar
-
-Baixe o ZIP, extraia **a pasta inteira** e abra `TicosHouse.exe`. Não é necessário ter Unity instalada. Mantenha `TicosHouse_Data`, `UnityPlayer.dll` e `MonoBleedingEdge` junto ao executável.
+Extraia a pasta inteira e abra TicosHouse.exe. Mantenha os arquivos e pastas acompanhantes. Não é necessário instalar Unity.
 
 ## Controles
 
-WASD/mouse no quarto; E interagir/sentar/levantar/deitar; F monitor; Enter procurar partida; mouse mover mira na Ascent; clique esquerdo atirar; R recarregar; Q pulso; Tab placar; M microfone fictício; V áudio FPS; −/+ ou Alt+roda volume FPS; Esc pausa/opções/reinício.
+WASD/mouse: quarto; E: interagir; F: monitor; Enter ou botão Buscar partida: iniciar partida; mouse: mira; clique esquerdo: tiro; R: recarga; Q: pulso; Tab: placar; M: microfone fictício; V: áudio FPS; −/+: volume FPS; Esc: pausa/opções.
 
-## Validação
+## Validação e limitações
 
-Núcleo de simulação testado em 200 seeds de Final Hunt e 30 noites completas. Player Windows testado em criação de cena, colisão, hitboxes, munição, recarga, dano, conclusão de partida, cama, monitor, Final Hunt e reinício. Veja `Docs/TESTING.md` para o escopo e seus limites.
+Testes automáticos cobrem transição sem proteção, ataque contínuo, entrada simultânea, derrota por tempo, tiros, headshots, comunicação, partida até 13, esconderijo, Final Hunt e reinício. O balanceamento ainda requer experiência humana; testes automatizados não certificam dificuldade subjetiva.
 
-## Limitações
+Personagens da casa geométricos, vozes sintetizadas e aliados simulados. Sem multiplayer ou acesso real a microfone/roteador. Fundos da Ascent são interpretações pixeladas de fã, não reproduções exatas.
 
-É uma versão inicial: personagens da casa geométricos, animações simples, falas sintetizadas e bots simplificados. Aliados são simulados fora do enquadramento. O balanceamento ainda se beneficia de partidas humanas. Não há multiplayer real, uso do microfone real ou alteração do Wi-Fi real.
-
-Unity **6000.3.14f1 / 6.3 LTS**, Windows x64, Mono, Direct3D 11.
-
-Projeto de fã não oficial. Valorant, Ascent e os agentes pertencem à Riot Games; sem afiliação ou endosso. As ilustrações foram criadas para esta versão, sem extrair assets dos arquivos do jogo. Fotos pessoais não são distribuídas.
-
-
-## Base de combate mantida
-
-- Gust começa cada round com 150 HP. Inimigos atiram com clarão, traçantes e dano de 22 a 33 por acerto, com maior frequência.
-- Cada eliminação de Gust troca entre Mercado B, bomb A e quadrado/varanda. Vida, munição e estatísticas são preservadas; há 0,65 s de pausa e tempo de reação dos bots.
-- Fundos são interpretações pixeladas de fã, não reproduções exatas da geometria original.
-
-
-## Dificuldade e locais novos
-
-- AD–AD com velocidade variável, arrancadas, breves pausas e inversões aleatórias; trajetos mais largos nos espaços abertos.
-- Inimigos entram a cada 1,15 s e atiram a cada 0,65–1,05 s, com maior precisão e prioridade no Gust. Dano permanece 22–33 e vida permanece 150.
-- Cinco enquadramentos: Mercado B, bomb A/Heaven, quadrado/varanda, bomb B/Boathouse e Árvore/Jardim. Troca a cada kill preserva vida e munição, com pausa de reação.
-- As ilustrações são interpretações de fã; balanceamento ainda sujeito a playtests humanos.
-
-
-
-## Alterações de combate 0.1.3 (substituem os valores anteriores)
-
-- Inimigos: tiros a cada 0,32–0,56 s, entrada a cada 0,65 s, corpo 26–36 e headshots 75–95 (22% dos acertos).
-- Comunicação melhora cadência e chance de acerto dos aliados. Eles suprimem a precisão dos inimigos atingidos por 0,65 s.
-- Cobertura depende da habilidade dos aliados vivos e comunicação: reduz o foco dos inimigos no Gust. Indicador na chamada e aviso de headshot recebido.
-- Mantidos 150 HP, cinco locais da Ascent e intervalo de reação na troca de cenário. Mutado não implica derrota automática.
+Unity 6000.3.14f1 / 6.3 LTS, Windows x64. Projeto de fã não oficial, sem afiliação com a Riot Games. Valorant, Ascent e agentes pertencem à Riot Games.
