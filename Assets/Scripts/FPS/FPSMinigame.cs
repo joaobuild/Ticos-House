@@ -9,6 +9,7 @@ namespace TicosHouse
         public string Name; public bool Ally; public float Skill,Health=100,Cooldown,SpawnAt,Height=118,Phase;
         public int Kills,Deaths,Assists,Agent;public bool Exceptional,DamagedByPlayer;
         public Transform Model;public Vector2 ScreenPos;public float ShotFlash;public bool AimedAtPlayer;
+        public float Offset,MoveSpeed,DecisionRemaining;public int Direction;
         public bool Alive {get{return Health>0;}}
     }
     // Fixed-camera pixel aim shooter: mouse aim and AD strafing, no map navigation.
@@ -19,7 +20,8 @@ namespace TicosHouse
         public const int MaxHealth=150;
         public int Blue,Red,Health=MaxHealth,Ammo=24,RoundKills;
         public int Scenario {get;private set;}
-        public string LocationName {get{return new[]{"MERCADO B","BOMB A / HEAVEN","QUADRADO / VARANDA"}[Scenario];}}
+        public int ScenarioCount {get{return backgrounds.Length;}}
+        public string LocationName {get{return new[]{"MERCADO B","BOMB A / HEAVEN","QUADRADO / VARANDA","BOMB B / BOATHOUSE","ÁRVORE / JARDIM"}[Scenario];}}
         public float TransitionRemaining;
         Material backgroundMaterial;Texture2D[] backgrounds;
         public float RoundTime,Intermission=3,ReloadRemaining,HitFlash,DamageFlash,FlashRemaining,LagRemaining,MuzzleFlash;
@@ -38,7 +40,7 @@ namespace TicosHouse
             Texture=new RenderTexture(640,360,16);Texture.filterMode=FilterMode.Point;Texture.name="Pixel Ascent monitor";Cam.targetTexture=Texture;
             var background=GameObject.CreatePrimitive(PrimitiveType.Quad);background.name="Ascent artwork";background.layer=8;background.transform.SetParent(root,false);
             background.transform.localPosition=new Vector3(0,0,5);background.transform.localScale=new Vector3(960,540,1);Destroy(background.GetComponent<Collider>());
-            backgrounds=new[]{Resources.Load<Texture2D>("Art/Ascent"),Resources.Load<Texture2D>("Art/AscentBombA"),Resources.Load<Texture2D>("Art/AscentMid")};
+            backgrounds=new[]{Resources.Load<Texture2D>("Art/Ascent"),Resources.Load<Texture2D>("Art/AscentBombA"),Resources.Load<Texture2D>("Art/AscentMid"),Resources.Load<Texture2D>("Art/AscentBombB"),Resources.Load<Texture2D>("Art/AscentTree")};
             backgroundMaterial=new Material(Resources.Load<Material>("PixelBackground"));backgroundMaterial.mainTexture=backgrounds[0];background.GetComponent<Renderer>().sharedMaterial=backgroundMaterial;
             agentMaterial=Resources.Load<Material>("PixelAgent");
         }
@@ -49,7 +51,7 @@ namespace TicosHouse
             Stats=new MatchStats();Blue=Red=0;MatchOver=false;Active=true;losses=0;Scenario=0;backgroundMaterial.mainTexture=backgrounds[0];
             string[] friends={"Joaobuild","Trolezi","Carlos","Loogins","Tavinho","Munhak"};friends=friends.OrderBy(x=>Random.value).ToArray();
             for(int i=0;i<4;i++)Spawn(friends[i],true,(friends[i]=="Carlos"||friends[i]=="Munhak")?.22f:.65f+Random.value*.18f,i);
-            for(int i=0;i<5;i++)Spawn(new[]{"Jett","Phoenix","Sage","Reyna","Omen"}[i],false,.55f+Game.Night.Difficulty*.12f,i);
+            for(int i=0;i<5;i++)Spawn(new[]{"Jett","Phoenix","Sage","Reyna","Omen"}[i],false,.67f+Game.Night.Difficulty*.12f,i);
             NewRound();Intermission=3;Banner="PARTIDA ENCONTRADA - ASCENT";
         }
         void Spawn(string name,bool ally,float skill,int index)
@@ -65,8 +67,9 @@ namespace TicosHouse
         void NewRound()
         {
             Health=MaxHealth;Ammo=24;RoundTime=0;RoundKills=0;PlayerDead=false;ReloadRemaining=0;FlashRemaining=0;abilityCooldown=0;Aim=new Vector2(480,270);TransitionRemaining=0;fireTime=0;DamageFlash=HitFlash=MuzzleFlash=0;
-            int e=0;foreach(var b in Bots){b.Health=100;b.DamagedByPlayer=false;b.Cooldown=Random.Range(1.3f,2.8f);b.Phase=Random.Range(0,6.28f);
-                b.SpawnAt=b.Ally?0:e++*1.9f+.6f;b.Height=b.Agent%2==0?122:108;
+            int e=0;foreach(var b in Bots){b.Health=100;b.DamagedByPlayer=false;b.Cooldown=Random.Range(.85f,1.3f);b.Phase=Random.Range(0,6.28f);
+                b.SpawnAt=b.Ally?0:e++*1.15f+.5f;b.Height=b.Agent%2==0?122:108;
+                b.Offset=Random.Range(-38f,38f);b.DecisionRemaining=0;b.Direction=Random.value<.5f?-1:1;
                 b.ShotFlash=0;if(!b.Ally){PlaceEnemy(b);b.Model.gameObject.SetActive(false);}
             }
             Banner="ROUND "+(Blue+Red+1);BannerTime=2;
@@ -78,16 +81,28 @@ namespace TicosHouse
         void PlaceEnemy(Combatant b)
         {
             // Feet positions match the floor/balcony in each painting (960 x 540 coordinates).
-            float x=Scenario==2?340:450;float y=Scenario==0?346:Scenario==1?357:235;
+            float x=Scenario==2?340:Scenario==3?405:Scenario==4?330:450;float y=Scenario==0?346:Scenario==1?357:Scenario==2?235:375;
             b.Height=Scenario==2?88:Scenario==1?105:118;
-            b.ScreenPos=new Vector2(x+(b.Agent%2)*53+Mathf.Sin(RoundTime*(3.8f+b.Agent*.22f)+b.Phase)*22,y);
+            b.ScreenPos=new Vector2(x+(b.Agent%2)*53+b.Offset,y);
             b.Model.localPosition=new Vector3(b.ScreenPos.x-480,270-b.ScreenPos.y+b.Height*.5f,1-b.Agent*.05f);
             b.Model.localScale=new Vector3(b.Height*.5f,b.Height,1);
+        }
+        void MoveEnemy(Combatant b,float dt)
+        {
+            b.DecisionRemaining-=dt;
+            if(b.DecisionRemaining<=0){
+                b.DecisionRemaining=Random.Range(.18f,.55f);b.Direction=Random.value<.5f?-1:1;
+                b.MoveSpeed=Random.value<.18f?0:Random.Range(110f,210f)*(1+Game.Night.Difficulty*.15f);
+            }
+            float limit=Scenario==0||Scenario==1?43:85;
+            b.Offset+=b.Direction*b.MoveSpeed*dt;
+            if(Mathf.Abs(b.Offset)>limit){b.Offset=Mathf.Clamp(b.Offset,-limit,limit);b.Direction=b.Offset>0?-1:1;}
+            PlaceEnemy(b);
         }
         void AdvanceScenario()
         {
             Scenario=(Scenario+1)%backgrounds.Length;backgroundMaterial.mainTexture=backgrounds[Scenario];TransitionRemaining=.65f;
-            foreach(var b in Bots){b.ShotFlash=0;b.Cooldown=Mathf.Max(b.Cooldown,1.15f);if(!b.Ally)PlaceEnemy(b);}
+            foreach(var b in Bots){b.ShotFlash=0;b.Cooldown=Mathf.Max(b.Cooldown,1.15f);b.Offset=Random.Range(-38f,38f);b.DecisionRemaining=0;if(!b.Ally)PlaceEnemy(b);}
             Banner="ASCENT • "+LocationName;BannerTime=1.2f;
         }
         public void Tick(float dt,bool controls)
@@ -103,7 +118,7 @@ namespace TicosHouse
             foreach(var b in Bots){
                 if(!b.Ally){
                     bool visible=Visible(b);b.Model.gameObject.SetActive(visible);
-                    if(visible)PlaceEnemy(b);
+                    if(visible)MoveEnemy(b,dt);
                 }
                 if(b.Alive)UpdateBot(b,dt);
             }
@@ -137,14 +152,14 @@ namespace TicosHouse
         void UpdateBot(Combatant b,float dt)
         {
             if(!b.Ally&&!Visible(b))return;
-            b.Cooldown-=dt;if(b.Cooldown>0)return;b.Cooldown=b.Ally?Random.Range(1.4f,2.4f):Random.Range(.9f,1.6f);
+            b.Cooldown-=dt;if(b.Cooldown>0)return;b.Cooldown=b.Ally?Random.Range(1.4f,2.4f):Random.Range(.65f,1.05f);
             if(b.Ally){
                 var enemies=Bots.Where(Visible).ToArray();if(enemies.Length==0)return;
                 var target=enemies[Random.Range(0,enemies.Length)];
                 if(Random.value<b.Skill*Game.Night.Communication*.40f){target.Health-=48;if(target.Health<=0)Kill(target,b);}
             }else{
                 Game.Audio.Fps("shot",new Vector3((b.ScreenPos.x-480)/18,0,0),.2f);
-                var friends=Bots.Where(x=>x.Ally&&x.Alive).ToArray();bool aimPlayer=!PlayerDead&&(friends.Length==0||Random.value<.65f);
+                var friends=Bots.Where(x=>x.Ally&&x.Alive).ToArray();bool aimPlayer=!PlayerDead&&(friends.Length==0||Random.value<.75f);
                 b.ShotFlash=.18f;b.AimedAtPlayer=aimPlayer;
                 float chance=b.Skill*(FlashRemaining>0?.12f:1);
                 if(Random.value<chance){

@@ -59,6 +59,16 @@ namespace TicosHouse
             Require(g.Fps.Health==150,"Gust starts with 150 health");
             Require(Resources.Load<Texture2D>("Art/AscentBombA")!=null&&Resources.Load<Texture2D>("Art/AscentMid")!=null,"additional Ascent backgrounds included");
             var enemy=g.Fps.Bots.First(b=>!b.Ally);
+            Require(g.Fps.ScenarioCount==5&&Resources.Load<Texture2D>("Art/AscentBombB")!=null&&Resources.Load<Texture2D>("Art/AscentTree")!=null,"five Ascent viewpoints loaded");
+            var randomState=UnityEngine.Random.state;UnityEngine.Random.InitState(1202);
+            float minX=float.MaxValue,maxX=float.MinValue;int reversals=0,previousDirection=enemy.Direction;bool bounded=true;
+            for(int motion=0;motion<600;motion++){
+                Invoke(g.Fps,"MoveEnemy",enemy,.016f);minX=Mathf.Min(minX,enemy.ScreenPos.x);maxX=Mathf.Max(maxX,enemy.ScreenPos.x);
+                if(enemy.Direction!=previousDirection)reversals++;previousDirection=enemy.Direction;
+                bounded&=Mathf.Abs(enemy.Offset)<=43.01f&&g.Fps.HeadRect(enemy).xMin>0&&g.Fps.HeadRect(enemy).xMax<960;
+            }
+            UnityEngine.Random.state=randomState;
+            Require(maxX-minX>70&&reversals>8&&bounded,"agile movement changes direction and stays inside combat lane");
             foreach(var b in g.Fps.Bots){b.Health=0;if(b.Model!=null)b.Model.gameObject.SetActive(false);}
             enemy.Health=100;enemy.SpawnAt=0;enemy.Model.gameObject.SetActive(true);
             g.Fps.Aim=g.Fps.HeadRect(enemy).center;
@@ -66,7 +76,8 @@ namespace TicosHouse
             Invoke(g.Fps,"Shoot");Require(g.Fps.Stats.Headshots==1&&g.Fps.Stats.Kills==1,"pixel head hitbox kill");
             Require(g.Fps.Scenario!=previousScenario&&g.Fps.Health==117&&g.Fps.RoundKills==1,"kill changes viewpoint without healing or resetting round stats");
             Require(g.Fps.TransitionRemaining>0,"viewpoint change grants reaction time");
-            for(int view=0;view<3;view++){
+            g.Fps.Tick(.2f,false);Require(g.Fps.Health==117&&g.Fps.TransitionRemaining>0,"no damage during viewpoint transition");
+            for(int view=0;view<g.Fps.ScenarioCount;view++){
                 Invoke(g.Fps,"AdvanceScenario");g.Fps.Cam.Render();RenderTexture previous=RenderTexture.active;RenderTexture.active=g.Fps.Texture;
                 var capture=new Texture2D(g.Fps.Texture.width,g.Fps.Texture.height,TextureFormat.RGB24,false);capture.ReadPixels(new Rect(0,0,capture.width,capture.height),0,0);capture.Apply();
                 File.WriteAllBytes(Path.Combine(output,"ascent-view-"+g.Fps.Scenario+".png"),capture.EncodeToPNG());Destroy(capture);RenderTexture.active=previous;
@@ -112,3 +123,4 @@ namespace TicosHouse
         }
     }
 }
+

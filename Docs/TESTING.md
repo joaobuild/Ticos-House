@@ -48,3 +48,7 @@ O runner usa o player real, renderização, física do quarto e métodos de game
 ## Regressão 0.1.1
 
 Build Windows validada com 34 verificações automatizadas (TICOS_QA_PASS): 150 HP, dano/efeito de tiro, morte, preservação de vida e estatísticas na troca de cenário, intervalo de reação, novos assets, munição, recarga, partida até 13, Final Hunt e restart. Fundos também renderizados diretamente da câmera para PNG e inspecionados. Execução oculta; não substitui playtest humano de dificuldade.
+
+## Regressão 0.1.2
+
+37 verificações do player passaram, incluindo cinco fundos carregados, movimento com amplitude maior que 70 pixels e mais de oito inversões numa amostra determinística de 9,6 s, limites das hitboxes e proteção durante troca de cenário. Novos fundos renderizados pela câmera e inspecionados. Não houve teste humano de dificuldade.

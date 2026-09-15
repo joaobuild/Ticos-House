@@ -25,3 +25,7 @@ Efeitos sintetizados pelo código e treze falas provisórias em português gerad
 ## Fundos adicionais 0.1.1
 
 AscentBombA.png e AscentMid.png gerados com image_gen (modo integrado), usando Ascent.png como referência de estilo. Prompts: pixel art 16:9 dentro do bomb A olhando Heaven/Hell; quadrado do meio olhando varanda/catwalk. Sem HUD ou inimigos, rifle no canto inferior direito. Interpretações artísticas de fã; não são capturas ou geometria extraída da Riot.
+
+## Arte 0.1.2
+
+AscentBombB.png e AscentTree.png: image_gen integrado, Ascent.png como referência de estilo. Prompts: pixel art 16:9 inside Ascent B site facing Boathouse; Ascent A Tree room facing Garden. Rifle no canto direito, sem personagens ou interface. Reinterpretações artísticas para projeto de fã.
