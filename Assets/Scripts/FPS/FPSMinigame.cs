@@ -71,8 +71,8 @@ namespace TicosHouse
         void NewRound()
         {
             Health=MaxHealth;Ammo=24;RoundTime=0;RoundKills=0;PlayerDead=false;ReloadRemaining=0;FlashRemaining=0;abilityCooldown=0;Aim=new Vector2(480,270);TransitionRemaining=0;fireTime=0;DamageFlash=HitFlash=MuzzleFlash=EnemyHeadshotFlash=0;EnemyHeadshots=0;
-            int e=0;foreach(var b in Bots){b.Health=100;b.DamagedByPlayer=false;b.Cooldown=Random.Range(.45f,.7f);b.Phase=Random.Range(0,6.28f);
-                b.SpawnAt=b.Ally?0:.35f+Mathf.Max(0,e++-2)*.55f;b.Height=b.Agent%2==0?122:108;b.Suppressed=0;
+            foreach(var b in Bots){b.Health=100;b.DamagedByPlayer=false;b.Cooldown=Random.Range(.45f,.7f);b.Phase=Random.Range(0,6.28f);
+                b.SpawnAt=b.Ally?0:.35f;b.Height=b.Agent%2==0?122:108;b.Suppressed=0;
                 b.Offset=Random.Range(-38f,38f);b.DecisionRemaining=0;b.Direction=Random.value<.5f?-1:1;
                 b.ShotFlash=0;if(!b.Ally){PlaceEnemy(b);b.Model.gameObject.SetActive(false);}
             }
@@ -81,7 +81,7 @@ namespace TicosHouse
         public Rect SpriteRect(Combatant b){return new Rect(b.ScreenPos.x-b.Height*.25f,b.ScreenPos.y-b.Height,b.Height*.5f,b.Height);}
         public Rect HeadRect(Combatant b){Rect r=SpriteRect(b);return new Rect(b.ScreenPos.x-b.Height*.10f,r.y+b.Height*.10f,b.Height*.20f,b.Height*.19f);}
         public Rect BodyRect(Combatant b){Rect r=SpriteRect(b);return new Rect(b.ScreenPos.x-b.Height*.18f,r.y+b.Height*.28f,b.Height*.36f,b.Height*.66f);}
-        public bool Visible(Combatant b){return !b.Ally&&b.Alive&&RoundTime>=b.SpawnAt&&Intermission<=0;}
+        public bool Visible(Combatant b){return !b.Ally&&b.Alive&&RoundTime>=b.SpawnAt&&Intermission<=0&&b==Bots.FirstOrDefault(x=>!x.Ally&&x.Alive);}
         void PlaceEnemy(Combatant b)
         {
             // Feet positions match the floor/balcony in each painting (960 x 540 coordinates).
@@ -182,6 +182,7 @@ namespace TicosHouse
         void Kill(Combatant target,Combatant killer)
         {
             target.Health=0;target.Deaths++;if(target.Model!=null)target.Model.gameObject.SetActive(false);
+            if(!target.Ally){var next=Bots.FirstOrDefault(b=>!b.Ally&&b.Alive);if(next!=null)next.SpawnAt=Mathf.Max(next.SpawnAt,RoundTime+.25f);}
             if(killer!=null){killer.Kills++;if(target.DamagedByPlayer&&!target.Ally)Stats.Assists++;}
         }
         void EndRound(bool won)

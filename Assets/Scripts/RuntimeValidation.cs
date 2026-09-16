@@ -125,7 +125,19 @@ namespace TicosHouse
             ally.Health=0;Require(g.Fps.TeamCover==0,"dead teammates provide no cover");
             UnityEngine.Random.state=randomState;g.Night.Stress=savedStress;g.Night.MicOpen=savedMic;
             g.Fps.NewMatch();g.Fps.Intermission=0;g.Fps.RoundTime=.36f;
-            Require(g.Fps.Bots.Count(b=>g.Fps.Visible(b))==3,"three enemies enter together");
+            Require(g.Fps.Bots.Count(b=>g.Fps.Visible(b))==1,"only one enemy enters at a time");
+            var queued=g.Fps.Bots.Last(b=>!b.Ally);queued.Skill=1;queued.Cooldown=0;int healthBeforeQueue=g.Fps.Health;
+            Invoke(g.Fps,"UpdateBot",queued,1f);
+            Require(g.Fps.Health==healthBeforeQueue&&queued.ShotFlash==0,"queued enemy cannot fire offscreen");
+            bool sequenceCorrect=true;
+            for(int duel=0;duel<5;duel++){
+                var current=g.Fps.Bots.First(b=>!b.Ally&&b.Alive);Invoke(g.Fps,"Kill",current,null);
+                sequenceCorrect&=g.Fps.Bots.Count(b=>g.Fps.Visible(b))==0;
+                g.Fps.RoundTime+=.3f;
+                sequenceCorrect&=g.Fps.Bots.Count(b=>g.Fps.Visible(b))==(duel==4?0:1);
+            }
+            Require(sequenceCorrect&&g.Fps.Health==150,"five sequential duels with no overlap or healing");
+            g.Fps.NewMatch();g.Fps.Intermission=0;
             foreach(var b in g.Fps.Bots)b.Cooldown=999;
             g.Fps.RoundTime=18;g.Fps.Tick(.01f,false);
             Require(g.Fps.Red==1&&g.Fps.Blue==0,"waiting with numerical advantage cannot win the objective");

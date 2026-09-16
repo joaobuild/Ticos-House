@@ -64,3 +64,9 @@ Resultado: 42 verificações do player aprovadas (TICOS_QA_PASS).
 Testes específicos: transição preserva cooldown inimigo; relógio e dano continuam após mudança; três inimigos simultâneos; vantagem numérica sem eliminar defensores não concede vitória por tempo. Atualizados limites da cadência. Mudança motivada por duas facilidades reais identificadas no código: pausa global e reset do cooldown após cada kill, e vitória passiva por número de sobreviventes.
 
 Resultado final 0.1.4: 44 verificações aprovadas, incluindo restart (TICOS_QA_PASS).
+
+## Regressão 0.1.5
+
+Verifica um único inimigo ativo, incapacidade de inimigos aguardando dispararem, cinco duelos sequenciais sem sobreposição e preservação de vida. Mantidas regressões de dano, headshot, comunicação, placar, Final Hunt e restart.
+
+Resultado 0.1.5: 46 verificações aprovadas (TICOS_QA_PASS) e smoke do ZIP extraído aprovado (TICOS_SMOKE_PASS).
