@@ -23,6 +23,7 @@ namespace TicosHouse
         Material screenMat;
         GUIStyle text,small,title,heading,center,button;
         Texture2D pixel;
+        Texture2D cover;
         Color teal=new Color(.22f,.88f,.77f), amber=new Color(1,.68f,.32f), pale=new Color(.86f,.90f,.90f), red=new Color(1,.32f,.27f);
         Vector3 seat=new Vector3(-1.5f,0,-1.68f),bed=new Vector3(2.8f,0,-2.30f);
         public bool ComputerView { get {return Night.AtComputer&&Night.MonitorOn&&Night.Started&&Night.Result==Ending.None;} }
@@ -32,6 +33,8 @@ namespace TicosHouse
         void Awake()
         {
             Application.targetFrameRate=90; QualitySettings.vSyncCount=1;
+            QualitySettings.antiAliasing=4;QualitySettings.pixelLightCount=8;QualitySettings.shadowResolution=ShadowResolution.High;
+            cover=Resources.Load<Texture2D>("Art/CoverGust");
             Sensitivity=PlayerPrefs.GetFloat("Sensitivity",2);
             RenderSettings.ambientLight=new Color(.10f,.13f,.18f);RenderSettings.ambientMode=UnityEngine.Rendering.AmbientMode.Flat;
             RenderSettings.fog=true;RenderSettings.fogColor=new Color(.017f,.025f,.04f);RenderSettings.fogDensity=.018f;RenderSettings.fogMode=FogMode.Exponential;
@@ -40,6 +43,7 @@ namespace TicosHouse
             player=p.AddComponent<CharacterController>();player.height=1.75f;player.center=Vector3.up*.875f;player.radius=.24f;player.stepOffset=.22f;
             var c=new GameObject("House ears and eyes");c.transform.SetParent(p.transform,false);c.transform.localPosition=Vector3.up*1.65f;
             RoomCamera=c.AddComponent<Camera>();RoomCamera.nearClipPlane=.06f;RoomCamera.farClipPlane=70;RoomCamera.fieldOfView=72;
+            RoomCamera.allowHDR=true;RoomCamera.allowMSAA=true;
             RoomCamera.cullingMask=~(1<<8);
             RoomCamera.clearFlags=CameraClearFlags.SolidColor;RoomCamera.backgroundColor=new Color(.01f,.018f,.03f);c.AddComponent<AudioListener>();
             Audio=gameObject.AddComponent<ProceduralAudio>();Audio.Listener=c.transform;Audio.MasterVolume=PlayerPrefs.GetFloat("MasterVolume",.65f);
@@ -234,7 +238,8 @@ namespace TicosHouse
         float ScreenWidth {get{return UnityEngine.Screen.width;}}float ScreenHeight {get{return UnityEngine.Screen.height;}}
         void Menu()
         {
-            Panel(0,0,715,720,new Color(.017f,.029f,.04f,.94f));
+            if(cover!=null)GUI.DrawTexture(new Rect(0,0,1280,720),cover,ScaleMode.ScaleAndCrop);
+            Panel(0,0,670,720,new Color(.017f,.029f,.04f,.55f));
             Panel(50,56,45,3,teal);Txt(110,44,520,30,"UMA NOITE. UM RANK. NENHUMA PERMISSÃO.",small,teal);
             Txt(45,123,650,210,"TICO'S\nHOUSE",title);Txt(52,345,590,36,"Às 21h era pra desligar.",heading);
             Txt(54,401,558,80,"Gust prometeu dormir. Os amigos prometeram jogar bem.\nUma dessas mentiras vai acordar o Tico.",text);
@@ -242,8 +247,7 @@ namespace TicosHouse
             if(Button(54,567,224,"COMO JOGAR"))showHelp=!showHelp;
             if(Button(300,567,224,"SAIR"))Application.Quit();
             Txt(54,675,600,28,"v"+Application.version+"  •  USE FONES DE OUVIDO  •  TERROR SEM GORE",small);
-            Txt(855,101,330,42,"21:00 → 06:00",heading,teal);
-            Txt(855,152,310,130,"PLATINA 3\n0 PDL\n\nA um Diamante do castigo.",text);
+            Txt(820,657,430,35,"GUST • A UM DIAMANTE DO CASTIGO",small,teal);
             if(showHelp){Panel(715,295,545,350,new Color(.02f,.035f,.045f,.98f));Help(746,316);}
         }
         void Help(float x,float y)
@@ -285,8 +289,8 @@ namespace TicosHouse
             else {
                 Txt(64,590,280,45,"HP  "+Fps.Health+" / 150",heading,Fps.Health<40?red:pale);
                 Txt(790,590,215,45,Fps.ReloadRemaining>0?"RECARGA":Fps.Ammo+" / 24",heading);
-                Txt(64,554,220,30,"Q  PULSO TÁTICO",small,teal);
-                if(!Fps.PlayerDead&&Fps.Intermission<=0){float cx=49+Fps.Aim.x/960*963,cy=132+Fps.Aim.y/540*516;Color cc=Fps.HitFlash>0?red:teal;Panel(cx-9,cy,5,2,cc);Panel(cx+5,cy,5,2,cc);Panel(cx,cy-9,2,5,cc);Panel(cx,cy+5,2,5,cc);}
+                Txt(64,554,480,30,"Q  PULSO • RAJADAS CURTAS = MAIS PRECISÃO",small,teal);
+                if(!Fps.PlayerDead&&Fps.Intermission<=0){float cx=49+Fps.Aim.x/960*963,cy=132+Fps.Aim.y/540*516,gap=5+Fps.Spread;Color cc=Fps.HitFlash>0?red:teal;Panel(cx-gap-5,cy,5,2,cc);Panel(cx+gap,cy,5,2,cc);Panel(cx,cy-gap-5,2,5,cc);Panel(cx,cy+gap,2,5,cc);}
                 if(Fps.MuzzleFlash>0){Panel(651,450,12,17,new Color(1,.77f,.24f,.7f));Panel(644,457,25,4,new Color(1,.92f,.5f,.8f));}
                 foreach(var enemy in Fps.Bots)if(Fps.Visible(enemy)&&enemy.ShotFlash>0){
                     float sx=49+(enemy.ScreenPos.x+enemy.Height*.12f)/960*963,sy=132+(enemy.ScreenPos.y-enemy.Height*.6f)/540*516;

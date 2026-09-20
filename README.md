@@ -1,8 +1,10 @@
 # Tico's House
 
+![Gust na capa](Assets/Resources/Art/CoverGust.png)
+
 Terror com comédia em primeira pessoa: Gustavo prometeu desligar o computador às 21h, mas entrou em mais uma partida com os amigos. O quarto, o FPS e a casa continuam funcionando ao mesmo tempo.
 
-**Versão 0.1.5 — Windows x64.**
+**Versão 0.1.7 — Windows x64.**
 
 ## Objetivo
 
@@ -52,7 +54,7 @@ O jogo não acessa seu microfone, Discord ou roteador reais. Toda comunicação 
 
 ## Download
 
-Baixe em [Tico's House v0.1.5](https://github.com/joaobuild/Ticos-House/releases/tag/v0.1.5). Extraia a pasta inteira e abra `TicosHouse.exe`. Não é necessário instalar Unity.
+Baixe em [Tico's House v0.1.7](https://github.com/joaobuild/Ticos-House/releases/tag/v0.1.7). Extraia a pasta inteira e abra `TicosHouse.exe`. Não é necessário instalar Unity.
 
 ## Desenvolvimento
 
@@ -111,3 +113,13 @@ Gust e aliados precisam eliminar os cinco inimigos em 18 segundos. Não basta so
 ### Regras atuais — 0.1.5
 
 Apenas UM inimigo aparece e pode atirar por vez. Depois de eliminado por Gust ou por um aliado, o próximo aparece após 0,25 s e usa seu tempo inicial de reação. Inimigos aguardando não atiram nem podem receber dano. Mantidos movimento, tiros rápidos, headshots, 150 HP, comunicação e limite de 18 s. Vida e munição não são recuperadas entre duelos.
+
+
+### Arma — 0.1.6
+
+Segurar o tiro causa recuo vertical real, desvio lateral e dispersão crescente. Compense puxando o mouse para baixo. A mira abre conforme perde precisão. Rajadas curtas e tiros isolados são mais precisos. Após 0,24 s sem disparar começa a recuperação; um spray máximo recupera totalmente em aproximadamente 0,87 s. Eliminações não reiniciam a precisão. Mantido um inimigo por vez.
+
+
+### Visual — 0.1.7
+
+Capa com Gust de terno e gravata, integrada ao menu. Quarto com materiais de madeira e tecido, cortinas, detalhes de móveis e luz quente de cabeceira. Personagens com silhuetas arredondadas, detalhes faciais e roupa; Meliça mantém o visual desgrenhado. Antialiasing 4x e até oito luzes por pixel. Arte da capa é ilustrativa; personagens em jogo continuam estilizados e procedurais. Inclui recuo/dispersão da atualização 0.1.6, que ainda não havia sido publicada.

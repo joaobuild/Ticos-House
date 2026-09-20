@@ -23,6 +23,9 @@ namespace TicosHouse
         public int ScenarioCount {get{return backgrounds.Length;}}
         public string LocationName {get{return new[]{"MERCADO B","BOMB A / HEAVEN","QUADRADO / VARANDA","BOMB B / BOATHOUSE","ÁRVORE / JARDIM"}[Scenario];}}
         public float TransitionRemaining;
+        public float SprayHeat {get;private set;}
+        public float Spread {get{return SprayHeat*2.4f;}}
+        float sinceShot;
         public float EnemyHeadshotFlash;
         public int EnemyHeadshots;
         public float Coordination {get{return Mathf.InverseLerp(.55f,1.2f,Game.Night.Communication);}}
@@ -70,7 +73,7 @@ namespace TicosHouse
         }
         void NewRound()
         {
-            Health=MaxHealth;Ammo=24;RoundTime=0;RoundKills=0;PlayerDead=false;ReloadRemaining=0;FlashRemaining=0;abilityCooldown=0;Aim=new Vector2(480,270);TransitionRemaining=0;fireTime=0;DamageFlash=HitFlash=MuzzleFlash=EnemyHeadshotFlash=0;EnemyHeadshots=0;
+            Health=MaxHealth;Ammo=24;RoundTime=0;RoundKills=0;PlayerDead=false;ReloadRemaining=0;FlashRemaining=0;abilityCooldown=0;Aim=new Vector2(480,270);TransitionRemaining=0;fireTime=0;DamageFlash=HitFlash=MuzzleFlash=EnemyHeadshotFlash=0;EnemyHeadshots=0;SprayHeat=0;sinceShot=1;
             foreach(var b in Bots){b.Health=100;b.DamagedByPlayer=false;b.Cooldown=Random.Range(.45f,.7f);b.Phase=Random.Range(0,6.28f);
                 b.SpawnAt=b.Ally?0:.35f;b.Height=b.Agent%2==0?122:108;b.Suppressed=0;
                 b.Offset=Random.Range(-38f,38f);b.DecisionRemaining=0;b.Direction=Random.value<.5f?-1:1;
@@ -119,6 +122,7 @@ namespace TicosHouse
             if(Intermission>0){Intermission-=dt;if(Intermission<=0)NewRound();return;}
             TransitionRemaining=Mathf.Max(0,TransitionRemaining-dt);
             RoundTime+=dt;fireTime-=dt;abilityCooldown-=dt;FlashRemaining-=dt;LagRemaining=Mathf.Max(0,LagRemaining-dt);
+            sinceShot+=dt;if(sinceShot>.24f)SprayHeat=Mathf.MoveTowards(SprayHeat,0,Mathf.Min(dt,sinceShot-.24f)*16);
             if(ReloadRemaining>0){ReloadRemaining-=dt;if(ReloadRemaining<=0)Ammo=24;}
             if(controls&&!PlayerDead)Control();
             foreach(var b in Bots){
@@ -147,7 +151,11 @@ namespace TicosHouse
             if(Ammo<=0){Reload();return;}
             Ammo--;Stats.Shots++;fireTime=.17f;MuzzleFlash=.075f;Game.Night.AddNoise(.4f);Game.Audio.Fps("shot",Vector3.zero,.65f);
             float tremor=Mathf.Max(0,Game.Night.Stress-65)*.08f;
-            Vector2 shot=Aim+Random.insideUnitCircle*tremor;
+            Vector2 shot=Aim+Random.insideUnitCircle*(tremor+Spread);
+            SprayHeat=Mathf.Min(10,SprayHeat+1.35f);sinceShot=0;
+            // Recoil moves the actual aim: pull the mouse down to compensate. Long sprays also drift sideways.
+            Aim+=new Vector2(SprayHeat>3?Mathf.Sin(Stats.Shots*1.7f)*SprayHeat*.65f:0,-(2.5f+SprayHeat*.65f));
+            Aim=new Vector2(Mathf.Clamp(Aim.x,3,957),Mathf.Clamp(Aim.y,3,537));
             foreach(var b in Bots.Where(Visible).OrderByDescending(b=>b.Agent)){
                 bool head=HeadRect(b).Contains(shot);if(!head&&!BodyRect(b).Contains(shot))continue;
                 Stats.Hits++;HitFlash=.16f;b.DamagedByPlayer=true;b.Health-=head?110:36;

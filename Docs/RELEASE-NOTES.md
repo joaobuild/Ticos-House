@@ -1,4 +1,4 @@
-# Tico's House v0.1.5 — Windows x64
+# Tico's House v0.1.7 — Windows x64
 
 ## Dificuldade corrigida
 
@@ -25,3 +25,17 @@ Personagens da casa geométricos, vozes sintetizadas e aliados simulados. Sem mu
 
 Unity 6000.3.14f1 / 6.3 LTS, Windows x64. Projeto de fã não oficial, sem afiliação com a Riot Games. Valorant, Ascent e agentes pertencem à Riot Games.
 
+
+
+## Arma 0.1.6
+
+Recuo vertical e lateral na mira, dispersão progressiva com tiro contínuo e abertura visual da mira. Rajadas curtas e tiros isolados favorecem precisão; puxar o mouse para baixo compensa o recuo. Parar de disparar recupera precisão; kills não zeram dispersão. Mantidos os duelos de um inimigo por vez.
+
+
+## Visual 0.1.7
+
+- Capa do Gust (terno, gravata turquesa e óculos) na tela inicial.
+- Texturas de madeira e tecido, cortinas, abajur, detalhes de cama e cadeira, molduras e cabos no quarto.
+- Silhuetas mais arredondadas e detalhes de rosto/roupa dos personagens; Meliça segue desgrenhada.
+- Antialiasing 4x, sombras em resolução alta e iluminação com maior número de luzes por pixel.
+- Inclui recuo e dispersão da 0.1.6 ainda não publicada. Personagens continuam procedurais e estilizados; a ilustração da capa tem maior detalhe que os modelos em jogo.

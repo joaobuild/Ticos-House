@@ -70,3 +70,13 @@ Resultado final 0.1.4: 44 verificações aprovadas, incluindo restart (TICOS_QA_
 Verifica um único inimigo ativo, incapacidade de inimigos aguardando dispararem, cinco duelos sequenciais sem sobreposição e preservação de vida. Mantidas regressões de dano, headshot, comunicação, placar, Final Hunt e restart.
 
 Resultado 0.1.5: 46 verificações aprovadas (TICOS_QA_PASS) e smoke do ZIP extraído aprovado (TICOS_SMOKE_PASS).
+
+## Regressão 0.1.6
+
+Verifica precisão inicial da arma, dispersão e deslocamento real da mira após oito disparos, preservação da dispersão entre cenários e recuperação ao parar. Mantidas regressões dos duelos sequenciais e sistemas da casa.
+
+## Visual 0.1.7
+
+Verifica capa carregada, texturas de superfície e antialiasing 4x. Runner gera capturas diretamente da câmera para dois ângulos do quarto e Gust, Guilherme e Tico, sem exibir uma janela de teste ao usuário. Inspeção identificou e corrigiu cartaz superdimensionado com texto atravessando os personagens; shader de texto agora respeita profundidade. Arte do menu é uma ilustração, não uma captura dos modelos.
+
+Resultado final 0.1.7: 52 verificações aprovadas (TICOS_QA_PASS). Capturas de quarto e Gust em Docs/Screenshots/Room-v017.png e Gust-v017.png.

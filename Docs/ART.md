@@ -29,3 +29,7 @@ AscentBombA.png e AscentMid.png gerados com image_gen (modo integrado), usando A
 ## Arte 0.1.2
 
 AscentBombB.png e AscentTree.png: image_gen integrado, Ascent.png como referência de estilo. Prompts: pixel art 16:9 inside Ascent B site facing Boathouse; Ascent A Tree room facing Garden. Rifle no canto direito, sem personagens ou interface. Reinterpretações artísticas para projeto de fã.
+
+## Visual 0.1.7
+
+CoverGust.png: image_gen integrado, foto enviada pelo usuário como referência de identidade e roupa. Prompt: key art 16:9 de terror com comédia, Gust à direita com terno preto, camisa branca, gravata turquesa e óculos, iluminação azul do monitor e Tico em silhueta na porta; esquerda escura livre para interface. A foto original não é distribuída. Texturas pequenas e decoração da casa geradas por código próprio em RoomPolish.cs.

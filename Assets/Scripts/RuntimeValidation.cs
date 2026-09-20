@@ -27,6 +27,13 @@ namespace TicosHouse
             yield return new WaitForEndOfFrame();
             ScreenCapture.CaptureScreenshot(Path.Combine(output,name+".png"));yield return new WaitForSeconds(.2f);
         }
+        void RenderRoom(string name,Vector3 position,Vector3 target)
+        {
+            var camera=g.RoomCamera;Vector3 oldPosition=camera.transform.position;Quaternion oldRotation=camera.transform.rotation;var oldTarget=camera.targetTexture;var active=RenderTexture.active;
+            var rt=new RenderTexture(1280,720,24);rt.antiAliasing=4;rt.Create();camera.targetTexture=rt;camera.transform.position=position;camera.transform.LookAt(target);camera.Render();RenderTexture.active=rt;
+            var texture=new Texture2D(1280,720,TextureFormat.RGB24,false);texture.ReadPixels(new Rect(0,0,1280,720),0,0);texture.Apply();File.WriteAllBytes(Path.Combine(output,name+".png"),texture.EncodeToPNG());
+            camera.targetTexture=oldTarget;camera.transform.position=oldPosition;camera.transform.rotation=oldRotation;RenderTexture.active=active;rt.Release();Destroy(rt);Destroy(texture);
+        }
         IEnumerator Start()
         {
             g=GetComponent<GameRuntime>();g.TestingFrozen=true;
@@ -48,6 +55,17 @@ namespace TicosHouse
             var player=FindObjectsByType<CharacterController>(FindObjectsSortMode.None).First(c=>c.name=="Gust first person");
             player.transform.rotation=Quaternion.Euler(0,210,0);g.RoomCamera.transform.localRotation=Quaternion.Euler(9,0,0);
             yield return Capture("02-bedroom");
+            Require(Resources.Load<Texture2D>("Art/CoverGust")!=null,"Gust cover included in player");
+            Require(WorldBuilder.Mat("Warm wood",Color.white).mainTexture!=null&&QualitySettings.antiAliasing==4,"room surface textures and antialiasing enabled");
+            RenderRoom("room-polished-desk",new Vector3(.6f,1.8f,1.8f),new Vector3(-1.4f,1.1f,-2.6f));
+            RenderRoom("room-polished-bed",new Vector3(-2f,1.7f,.5f),new Vector3(2.3f,.9f,-2));
+            var models=new[]{g.GustModel,g.BrotherModel,g.TicoModel};
+            for(int person=0;person<models.Length;person++){
+                var model=models[person];var position=model.position;var rotation=model.rotation;bool active=model.gameObject.activeSelf;
+                model.gameObject.SetActive(true);model.position=new Vector3(0,0,-1);model.rotation=Quaternion.identity;
+                RenderRoom("character-"+person,new Vector3(0,1.6f,1.2f),new Vector3(0,1.2f,-1));
+                model.position=position;model.rotation=rotation;model.gameObject.SetActive(active);
+            }
             Invoke(g,"Teleport",new Vector3(-3.5f,0,0));for(int i=0;i<20;i++)player.Move(Vector3.left*.2f);
             Require(player.transform.position.x> -3.8f,"bedroom wall collision");
             Invoke(g,"Teleport",new Vector3(-1.5f,0,-1.05f));Invoke(g,"Interact");Require(g.Night.AtComputer,"chair proximity interaction");
@@ -145,6 +163,15 @@ namespace TicosHouse
             var oldAim=g.Fps.Aim;g.Fps.Aim=new Vector2(0,0);int oldHits=g.Fps.Stats.Hits;Invoke(g.Fps,"Shoot");Require(g.Fps.Stats.Hits==oldHits,"miss does not award hit");g.Fps.Aim=oldAim;
             g.Fps.Ammo=0;g.Fps.Reload();Require(g.Fps.ReloadRemaining>0,"empty magazine reload starts");g.Fps.Tick(1.5f,false);Require(g.Fps.Ammo==24,"reload restores magazine");
             g.Fps.NewMatch();g.Fps.Intermission=0;int frames=0;
+            foreach(var b in g.Fps.Bots)b.Cooldown=999;
+            g.Fps.Aim=new Vector2(20,450);float originalAimY=g.Fps.Aim.y;
+            Require(g.Fps.Spread==0,"first shot has no weapon spread");
+            for(int spray=0;spray<8;spray++)Invoke(g.Fps,"Shoot");
+            Require(g.Fps.Spread>=20&&g.Fps.Aim.y<originalAimY-30&&g.Fps.Ammo==16,"held spray builds spread and actual upward recoil");
+            float heatBeforeKill=g.Fps.SprayHeat;Invoke(g.Fps,"AdvanceScenario");
+            Require(g.Fps.SprayHeat==heatBeforeKill,"kill transition does not reset weapon accuracy");
+            g.Fps.Tick(1f,false);Require(g.Fps.Spread==0,"cease fire recovers weapon accuracy");
+            g.Fps.NewMatch();g.Fps.Intermission=0;
             while(!g.Fps.MatchOver&&frames<20000) {
                 Physics.SyncTransforms();g.Fps.Tick(.1f,false);frames++;
                 if(frames%100==0)yield return null;

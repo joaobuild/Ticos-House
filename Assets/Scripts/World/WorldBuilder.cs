@@ -13,6 +13,7 @@ namespace TicosHouse
             Material template=Resources.Load<Material>("RuntimeStandard");
             m = template!=null?new Material(template):new Material(Shader.Find("Standard")); m.name = name; m.color = color;
             m.SetFloat("_Glossiness", .15f);
+            if(!glow)RoomPolish.Surface(m,name);
             if (glow) { m.EnableKeyword("_EMISSION"); m.SetColor("_EmissionColor", color * 1.8f); }
             materials[name] = m; return m;
         }
@@ -37,6 +38,7 @@ namespace TicosHouse
             GameObject go = new GameObject("Label " + text); go.transform.SetParent(parent, false); go.transform.localPosition = pos;
             go.transform.localRotation = Quaternion.Euler(0, yaw, 0);
             TextMesh t = go.AddComponent<TextMesh>(); t.text = text; t.characterSize = scale; t.fontSize = 70;
+            t.font=Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");var textMaterial=new Material(Resources.Load<Shader>("TextDepth"));textMaterial.mainTexture=t.font.material.mainTexture;go.GetComponent<Renderer>().sharedMaterial=textMaterial;
             t.anchor = TextAnchor.MiddleCenter; t.alignment = TextAlignment.Center; t.color = color; return t;
         }
         public static Transform Human(string name, Vector3 pos, bool father, bool suit, Transform parent = null)
@@ -47,12 +49,17 @@ namespace TicosHouse
             Material dark = Mat("Hair", new Color(.045f,.032f,.025f));
             Material white = Mat("Ivory", new Color(.82f,.83f,.78f));
             Material pants = Mat("Pants",new Color(.055f,.065f,.085f));
-            Box("Torso",new Vector3(0,1.12f,0),new Vector3(.58f,.72f,.3f),cloth,root,false);
-            Box("Left arm",new Vector3(-.38f,1.08f,0),new Vector3(.17f,.69f,.19f),cloth,root,false);
-            Box("Right arm",new Vector3(.38f,1.08f,0),new Vector3(.17f,.69f,.19f),cloth,root,false);
+            Shape("Tailored torso",PrimitiveType.Sphere,new Vector3(0,1.12f,0),new Vector3(.60f,.82f,.34f),cloth,root);
+            Shape("Neck",PrimitiveType.Cylinder,new Vector3(0,1.48f,0),new Vector3(.18f,.13f,.18f),skin,root);
+            for(int side=-1;side<=1;side+=2){
+                Shape("Shoulder",PrimitiveType.Sphere,new Vector3(side*.27f,1.37f,0),new Vector3(.23f,.23f,.29f),cloth,root);
+                Shape("Sleeve",PrimitiveType.Capsule,new Vector3(side*.36f,1.08f,0),new Vector3(.19f,.35f,.21f),cloth,root);
+                Shape("Ear",PrimitiveType.Sphere,new Vector3(side*.213f,1.72f,0),new Vector3(.095f,.16f,.085f),skin,root);
+                Shape("Cheek",PrimitiveType.Sphere,new Vector3(side*.115f,1.65f,.11f),new Vector3(.17f,.16f,.13f),skin,root);
+            }
             for(int s=-1;s<=1;s+=2) {
-                Box("Hand",new Vector3(s*.38f,.70f,0),new Vector3(.15f,.18f,.16f),skin,root,false);
-                Box("Leg",new Vector3(s*.17f,.41f,0),new Vector3(.23f,.73f,.25f),pants,root,false);
+                Shape("Hand",PrimitiveType.Capsule,new Vector3(s*.36f,.70f,0),new Vector3(.13f,.105f,.13f),skin,root);
+                Shape("Trouser leg",PrimitiveType.Capsule,new Vector3(s*.15f,.42f,0),new Vector3(.235f,.38f,.26f),pants,root);
                 Box("Shoe",new Vector3(s*.17f,.08f,.08f),new Vector3(.25f,.13f,.39f),dark,root,false);
             }
             Shape("Head",PrimitiveType.Sphere,new Vector3(0,1.72f,0),new Vector3(.42f,.51f,.4f),skin,root);
@@ -65,6 +72,7 @@ namespace TicosHouse
             for(int s=-1;s<=1;s+=2) {
                 Shape("Eye white",PrimitiveType.Sphere,new Vector3(s*.092f,1.76f,.176f),new Vector3(.094f,.046f,.04f),white,root);
                 Shape("Pupil",PrimitiveType.Sphere,new Vector3(s*.092f,1.76f,.20f),new Vector3(.037f,.042f,.018f),dark,root);
+                Shape("Eye catchlight",PrimitiveType.Sphere,new Vector3(s*.092f-.007f,1.769f,.21f),Vector3.one*.012f,white,root);
                 Box("Brow",new Vector3(s*.096f,1.82f,.192f),new Vector3(.13f,.025f,.025f),dark,root,false);
             }
             Box("Mouth",new Vector3(0,1.59f,.18f),new Vector3(.14f,.025f,.03f),dark,root,false);
@@ -73,11 +81,16 @@ namespace TicosHouse
                 Shape("Beard",PrimitiveType.Sphere,new Vector3(0,1.56f,.05f),new Vector3(.37f,.20f,.33f),beard,root);
                 Box("Mustache",new Vector3(0,1.65f,.203f),new Vector3(.23f,.047f,.028f),beard,root,false);
                 Box("Belt prop",new Vector3(.40f,.39f,.09f),new Vector3(.055f,.63f,.03f),Mat("Leather",new Color(.16f,.065f,.025f)),root,false);
-                for(int i=-3;i<=3;i++) Box("Shirt stripe",new Vector3(i*.075f,1.13f,.155f),new Vector3(.012f,.69f,.005f),white,root,false);
+                // Stripes are woven into the shirt material, so they follow its rounded silhouette.
             }
             if(suit) {
                 Box("White shirt",new Vector3(0,1.20f,.156f),new Vector3(.23f,.56f,.02f),white,root,false);
                 Box("Turquoise tie",new Vector3(0,1.19f,.18f),new Vector3(.095f,.44f,.025f),Mat("Tie",new Color(.025f,.65f,.64f)),root,false);
+                Shape("Tie knot",PrimitiveType.Sphere,new Vector3(0,1.40f,.18f),new Vector3(.10f,.085f,.045f),Mat("Tie",Color.cyan),root);
+                for(int side=-1;side<=1;side+=2){
+                    var lapel=Box("Suit lapel",new Vector3(side*.14f,1.31f,.175f),new Vector3(.10f,.32f,.024f),cloth,root,false);lapel.transform.localRotation=Quaternion.Euler(0,0,side*-23);
+                    var collar=Box("Shirt collar",new Vector3(side*.07f,1.43f,.16f),new Vector3(.075f,.12f,.025f),white,root,false);collar.transform.localRotation=Quaternion.Euler(0,0,side*25);
+                }
                 for(int s=-1;s<=1;s+=2) {
                     Box("Glasses upper",new Vector3(s*.105f,1.80f,.213f),new Vector3(.18f,.02f,.025f),dark,root,false);
                     Box("Glasses lower",new Vector3(s*.105f,1.71f,.213f),new Vector3(.18f,.015f,.025f),dark,root,false);
@@ -101,6 +114,8 @@ namespace TicosHouse
             Shape("Snout",PrimitiveType.Sphere,new Vector3(0,.40f,.48f),new Vector3(.15f,.12f,.14f),dark,root);
             for(int i=0;i<13;i++) Shape("Fur tuft",PrimitiveType.Sphere,new Vector3(Mathf.Sin(i*4)*.19f,.42f+Mathf.Cos(i*7)*.15f,.38f),new Vector3(.08f,.13f,.11f),fur,root);
             Box("Pink bow",new Vector3(-.24f,.58f,.29f),new Vector3(.17f,.09f,.08f),Mat("Pink bow",new Color(.91f,.12f,.47f)),root,false);
+            var tail=Shape("Scruffy tail",PrimitiveType.Capsule,new Vector3(0,.47f,-.37f),new Vector3(.09f,.22f,.10f),fur,root);tail.transform.localRotation=Quaternion.Euler(-35,0,0);
+            for(int side=-1;side<=1;side+=2)Shape("Bow loop",PrimitiveType.Sphere,new Vector3(-.24f+side*.07f,.58f,.30f),new Vector3(.12f,.11f,.06f),Mat("Pink bow",Color.magenta),root);
             return root;
         }
         public static void Room(GameRuntime game)
@@ -163,14 +178,14 @@ namespace TicosHouse
             Box("Window cross",new Vector3(-3.79f,1.9f,.65f),new Vector3(.03f,.055f,1.88f),dark,root,false);
             for(int i=0;i<8;i++) Box("Blind slat",new Vector3(-3.73f,2.6f-i*.08f,.65f),new Vector3(.05f,.043f,2),wood,root,false);
             Box("Poster",new Vector3(-.7f,2.05f,-3.88f),new Vector3(1.22f,1.20f,.025f),dark,root,false);
-            Label("SÓ MAIS\nUMA.",new Vector3(-.7f,2.11f,-3.85f),.12f,new Color(.3f,.9f,.8f),root,180);
+            Label("SÓ MAIS\nUMA.",new Vector3(-.7f,2.11f,-3.85f),.025f,new Color(.3f,.9f,.8f),root,180);
             Box("Book shelf",new Vector3(-2.6f,2.3f,-3.63f),new Vector3(1.65f,.09f,.45f),wood,root,false);
             for(int i=0;i<7;i++) Box("Book",new Vector3(-3.2f+i*.16f,2.48f,-3.65f),new Vector3(.1f,.30f+(i%3)*.06f,.21f),Mat("Book"+i,Color.HSVToRGB(i*.12f,.42f,.46f)),root,false);
             Shape("Mug",PrimitiveType.Cylinder,new Vector3(-2.64f,1.01f,-2.6f),new Vector3(.16f,.13f,.16f),trim,root);
             Box("Rug",new Vector3(.1f,.01f,-.35f),new Vector3(2.6f,.01f,2.4f),Mat("Rug",new Color(.22f,.16f,.14f)),root,false);
             game.MonitorLight=Lamp("Monitor light",new Vector3(-1.5f,1.7f,-2.25f),new Color(.13f,.72f,1),1.6f,4.8f,root);
-            Lamp("Moonlight",new Vector3(-3.5f,2.4f,.5f),new Color(.22f,.38f,.68f),1.45f,8,root);
-            Lamp("Soft room fill",new Vector3(.5f,2.6f,.6f),new Color(.35f,.42f,.52f),.30f,7,root).shadows=LightShadows.None;
+            var moon=Lamp("Moonlight",new Vector3(-3.5f,2.4f,.5f),new Color(.40f,.57f,.85f),3.2f,10,root);moon.type=LightType.Spot;moon.spotAngle=95;moon.transform.LookAt(new Vector3(.5f,.3f,-1.4f));moon.shadowBias=.025f;
+            Lamp("Soft room fill",new Vector3(.5f,2.6f,.6f),new Color(.46f,.51f,.60f),.60f,8,root).shadows=LightShadows.None;
             Lamp("LED bounce",new Vector3(-1.3f,.55f,-3),new Color(.03f,.95f,.65f),.7f,3,root);
             game.TicoModel=Human("Tico",new Vector3(1.3f,0,6),true,false,root);
             game.TicoModel.localRotation=Quaternion.Euler(0,180,0); game.TicoModel.gameObject.SetActive(false);
@@ -178,6 +193,7 @@ namespace TicosHouse
             game.DogModel=Dog(new Vector3(.5f,0,.8f),root);
             game.GustModel=Human("Gust • suit and tie",new Vector3(-1.5f,-.4f,-1.63f),false,true,root);
             game.GustModel.localRotation=Quaternion.Euler(0,180,0);
+            RoomPolish.Decorate(root);
         }
         public static Transform Arena()
         {

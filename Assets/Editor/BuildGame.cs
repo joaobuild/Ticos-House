@@ -17,7 +17,7 @@ public static class BuildGame
             AssetDatabase.CreateAsset(new Material(Shader.Find("Unlit/Transparent")),"Assets/Resources/PixelAgent.mat");
         foreach(string path in Directory.GetFiles("Assets/Resources/Art","*.png")){
             var importer=AssetImporter.GetAtPath(path) as TextureImporter;
-            if(importer!=null){importer.filterMode=FilterMode.Point;importer.mipmapEnabled=false;importer.alphaIsTransparency=true;importer.npotScale=TextureImporterNPOTScale.None;importer.maxTextureSize=2048;importer.textureCompression=TextureImporterCompression.Uncompressed;importer.SaveAndReimport();}
+            if(importer!=null){importer.filterMode=path.Contains("CoverGust")?FilterMode.Bilinear:FilterMode.Point;importer.mipmapEnabled=false;importer.alphaIsTransparency=true;importer.npotScale=TextureImporterNPOTScale.None;importer.maxTextureSize=2048;importer.textureCompression=TextureImporterCompression.Uncompressed;importer.SaveAndReimport();}
         }
         // An explicit material reference prevents Standard shader stripping in a procedural scene.
         if(AssetDatabase.LoadAssetAtPath<Material>("Assets/Resources/RuntimeStandard.mat")==null)
@@ -32,7 +32,7 @@ public static class BuildGame
         EditorSceneManager.SaveScene(scene,"Assets/Scenes/Night.unity");
         EditorBuildSettings.scenes=new[]{new EditorBuildSettingsScene("Assets/Scenes/Night.unity",true)};
         PlayerSettings.companyName="Joaobuild";PlayerSettings.productName="Tico's House";
-        PlayerSettings.bundleVersion="0.1.5";PlayerSettings.defaultScreenWidth=1280;PlayerSettings.defaultScreenHeight=720;
+        PlayerSettings.bundleVersion="0.1.7";PlayerSettings.defaultScreenWidth=1280;PlayerSettings.defaultScreenHeight=720;
         PlayerSettings.fullScreenMode=FullScreenMode.Windowed;PlayerSettings.resizableWindow=true;
         PlayerSettings.runInBackground=true;
         PlayerSettings.SetScriptingBackend(UnityEditor.Build.NamedBuildTarget.Standalone,ScriptingImplementation.Mono2x);
@@ -45,6 +45,8 @@ public static class BuildGame
         Debug.Log("TICOS_BUILD_SUCCESS "+report.summary.totalSize);
     }
 }
+
+
 
 
 
