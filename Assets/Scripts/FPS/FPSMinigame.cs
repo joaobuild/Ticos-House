@@ -19,6 +19,8 @@ namespace TicosHouse
         public MatchStats Stats=new MatchStats();public readonly List<Combatant>Bots=new List<Combatant>();
         public const int MaxHealth=150;
         public int Blue,Red,Health=MaxHealth,Ammo=24,RoundKills;
+        public int AllyRoundKills {get;private set;}
+        public int AllyKillBudget {get;private set;}
         public int Scenario {get;private set;}
         public int ScenarioCount {get{return backgrounds.Length;}}
         public string LocationName {get{return new[]{"MERCADO B","BOMB A / HEAVEN","QUADRADO / VARANDA","BOMB B / BOATHOUSE","ÁRVORE / JARDIM"}[Scenario];}}
@@ -73,6 +75,7 @@ namespace TicosHouse
         }
         void NewRound()
         {
+            AllyRoundKills=0;AllyKillBudget=Random.Range(1,3);
             Health=MaxHealth;Ammo=24;RoundTime=0;RoundKills=0;PlayerDead=false;ReloadRemaining=0;FlashRemaining=0;abilityCooldown=0;Aim=new Vector2(480,270);TransitionRemaining=0;fireTime=0;DamageFlash=HitFlash=MuzzleFlash=EnemyHeadshotFlash=0;EnemyHeadshots=0;SprayHeat=0;sinceShot=1;
             foreach(var b in Bots){b.Health=100;b.DamagedByPlayer=false;b.Cooldown=Random.Range(.45f,.7f);b.Phase=Random.Range(0,6.28f);
                 b.SpawnAt=b.Ally?0:.35f;b.Height=b.Agent%2==0?122:108;b.Suppressed=0;
@@ -174,7 +177,9 @@ namespace TicosHouse
                 var target=enemies[Random.Range(0,enemies.Length)];
                 float accuracy=b.Skill*(weakAlly?Mathf.Lerp(.20f,.85f,Coordination):Mathf.Lerp(.60f,.98f,Coordination));
                 if(Random.value<accuracy){
-                    target.Health-=weakAlly?48:55;target.Suppressed=.65f;
+                    // Once their 1–2 eliminations are used, allies provide cover instead of clearing the round.
+                    if(AllyRoundKills<AllyKillBudget)target.Health-=weakAlly?48:55;
+                    target.Suppressed=.65f;
                     if(target.Health<=0)Kill(target,b);
                 }
             }else{
@@ -194,7 +199,7 @@ namespace TicosHouse
         {
             target.Health=0;target.Deaths++;if(target.Model!=null)target.Model.gameObject.SetActive(false);
             if(!target.Ally){var next=Bots.FirstOrDefault(b=>!b.Ally&&b.Alive);if(next!=null)next.SpawnAt=Mathf.Max(next.SpawnAt,RoundTime+.25f);}
-            if(killer!=null){killer.Kills++;if(target.DamagedByPlayer&&!target.Ally)Stats.Assists++;if(killer.Ally){KillFeed=killer.Name+" > "+target.Name;FeedTime=3;}}
+            if(killer!=null){killer.Kills++;if(target.DamagedByPlayer&&!target.Ally)Stats.Assists++;if(killer.Ally){AllyRoundKills++;KillFeed=killer.Name+" > "+target.Name;FeedTime=3;}}
         }
         void EndRound(bool won)
         {

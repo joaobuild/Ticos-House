@@ -92,3 +92,8 @@ Resultado 0.1.8: 57 verificações automatizadas aprovadas na build final (TICOS
 Benchmark integrado com 60 seeds por modo de microfone (120 rounds), dois aliados bons de skill 0,75 e Carlos/Munhak de skill 0,22. Gust simulado tenta tiros no corpo a cada 0,75 s, enquanto vivo; todos os bots usam os sistemas reais. Não é um playtest humano nem garantia de kills em qualquer situação. O runner agora silencia o volume geral apenas durante os testes.
 
 Resultado do benchmark: aliados bons somados 2,2167 kills/round mutado e 2,6667 aberto; Carlos/Munhak somados 0,2167 mutado e 0,8 aberto. Médias desta simulação específica, não garantias de partidas humanas. 59 verificações aprovadas na build final.
+
+## Limite de aliados 0.1.10
+
+Mesmo benchmark de 120 rounds: aliados somados 1,35 kills/round mutado e 1,4833 aberto. Nenhum round ultrapassou o orçamento sorteado nem o teto de duas kills. Carlos/Munhak mantidos abaixo dos aliados bons. 61 verificações automatizadas aprovadas na build final (TICOS_QA_PASS). As médias são desta simulação, não garantias por partida humana.
+

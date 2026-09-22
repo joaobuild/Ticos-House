@@ -157,7 +157,7 @@ namespace TicosHouse
             string[] benchmarkNames={"Joaobuild","Trolezi","Carlos","Munhak"};
             for(int i=0;i<4;i++){teammates[i].Name=benchmarkNames[i];teammates[i].Skill=i<2?.75f:.22f;teammates[i].Exceptional=false;}
             for(int mode=0;mode<2;mode++){
-                int goodKills=0,weakKills=0;g.Night.MicOpen=mode==1;
+                int goodKills=0,weakKills=0;bool capped=true;g.Night.MicOpen=mode==1;
                 for(int trial=0;trial<60;trial++){
                     UnityEngine.Random.InitState(9000+trial);g.Night.Stress=20;g.Fps.Blue=g.Fps.Red=0;g.Fps.Intermission=0;Invoke(g.Fps,"NewRound");
                     int goodBefore=teammates[0].Kills+teammates[1].Kills,weakBefore=teammates[2].Kills+teammates[3].Kills;
@@ -170,10 +170,12 @@ namespace TicosHouse
                         }
                     }
                     goodKills+=teammates[0].Kills+teammates[1].Kills-goodBefore;weakKills+=teammates[2].Kills+teammates[3].Kills-weakBefore;
+                    capped&=g.Fps.AllyRoundKills<=2&&g.Fps.AllyRoundKills<=g.Fps.AllyKillBudget;
                     if(trial%10==0)yield return null;
                 }
                 Debug.Log("TEAM_BALANCE mic="+(mode==1)+" goodKillsPerRound="+(goodKills/60f)+" weakKillsPerRound="+(weakKills/60f));
                 Require(goodKills>=48&&goodKills>weakKills*3,"good teammates contribute consistently and outperform Carlos/Munhak mode "+mode);
+                Require(capped&&(goodKills+weakKills)/60f<=1.7f,"team stays under two kills each round and near target average mode "+mode);
             }
             UnityEngine.Random.state=randomState;g.Night.Stress=savedStress;g.Night.MicOpen=savedMic;
             g.Fps.NewMatch();g.Fps.Intermission=0;g.Fps.RoundTime=.36f;

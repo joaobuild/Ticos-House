@@ -4,7 +4,7 @@
 
 Terror com comédia em primeira pessoa: Gustavo prometeu desligar o computador às 21h, mas entrou em mais uma partida com os amigos. O quarto, o FPS e a casa continuam funcionando ao mesmo tempo.
 
-**Versão 0.1.9 — Windows x64.**
+**Versão 0.1.10 — Windows x64.**
 
 ## Objetivo
 
@@ -54,7 +54,7 @@ O jogo não acessa seu microfone, Discord ou roteador reais. Toda comunicação 
 
 ## Download
 
-Baixe em [Tico's House v0.1.9](https://github.com/joaobuild/Ticos-House/releases/tag/v0.1.9). Extraia a pasta inteira e abra `TicosHouse.exe`. Não é necessário instalar Unity.
+Baixe em [Tico's House v0.1.10](https://github.com/joaobuild/Ticos-House/releases/tag/v0.1.10). Extraia a pasta inteira e abra `TicosHouse.exe`. Não é necessário instalar Unity.
 
 ## Desenvolvimento
 
@@ -135,3 +135,8 @@ Bots ligeiramente aliviados: intervalo 0,25–0,42 s entre tiros e headshot em 2
 ### Aliados — 0.1.9
 
 Joaobuild, Trolezi, Loogins e Tavinho contribuem mais com tiros mais frequentes, precisão base maior e 55 de dano por acerto. Comunicação ainda melhora a eficiência, mas mutar não inutiliza o time. Carlos e Munhak mantêm o comportamento fraco, salvo as raras partidas excepcionais. O aviso de kills mostra eliminações dos aliados. Eliminações dependem de sobrevivência, tempo e participação do Gust; não são concedidas artificialmente por round.
+
+
+### Limite do time — 0.1.10
+
+Os quatro aliados juntos podem conseguir 1 ou 2 eliminações por round, sorteadas com chances iguais (média de orçamento 1,5, teto 2). Depois disso, continuam suprimindo inimigos e oferecendo cobertura, mas não causam mais dano nesse round. Kills precisam acontecer por combate; podem terminar abaixo do orçamento. Kills do Gust não entram no limite. Carlos/Munhak continuam menos habilidosos.

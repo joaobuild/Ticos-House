@@ -32,7 +32,7 @@ public static class BuildGame
         EditorSceneManager.SaveScene(scene,"Assets/Scenes/Night.unity");
         EditorBuildSettings.scenes=new[]{new EditorBuildSettingsScene("Assets/Scenes/Night.unity",true)};
         PlayerSettings.companyName="Joaobuild";PlayerSettings.productName="Tico's House";
-        PlayerSettings.bundleVersion="0.1.9";PlayerSettings.defaultScreenWidth=1280;PlayerSettings.defaultScreenHeight=720;
+        PlayerSettings.bundleVersion="0.1.10";PlayerSettings.defaultScreenWidth=1280;PlayerSettings.defaultScreenHeight=720;
         PlayerSettings.fullScreenMode=FullScreenMode.Windowed;PlayerSettings.resizableWindow=true;
         PlayerSettings.runInBackground=true;
         PlayerSettings.SetScriptingBackend(UnityEditor.Build.NamedBuildTarget.Standalone,ScriptingImplementation.Mono2x);
@@ -45,6 +45,7 @@ public static class BuildGame
         Debug.Log("TICOS_BUILD_SUCCESS "+report.summary.totalSize);
     }
 }
+
 
 
 

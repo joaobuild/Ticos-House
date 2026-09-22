@@ -1,4 +1,8 @@
-# Tico's House v0.1.9 — Windows x64
+# Tico's House v0.1.10 — Windows x64
+
+## Limite de aliados 0.1.10
+
+Os quatro aliados somados têm um orçamento sorteado de 1 ou 2 kills por round (50/50), mirando 1,5 em média e nunca ultrapassando 2. Depois do orçamento, oferecem cobertura/supressão sem dano. O limite reinicia por round e não conta kills do Gust. Não há eliminações gratuitas; média real pode ser menor conforme o combate.
 
 ## Áudio em foco
 
@@ -35,3 +39,4 @@ Unity 6000.3.14f1 / 6.3 LTS, Windows x64. Projeto de fã não oficial; Valorant,
 - Carlos e Munhak seguem fracos, com raras exceções já existentes.
 - Aviso de kills mostra eliminações dos aliados. Não há kills atribuídas gratuitamente nem garantia por round.
 - Mantidos os inimigos, os duelos individuais, o recuo e o áudio da 0.1.8.
+
