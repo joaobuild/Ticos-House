@@ -59,7 +59,7 @@ namespace TicosHouse
             string[] friends={"Joaobuild","Trolezi","Carlos","Loogins","Tavinho","Munhak"};friends=friends.OrderBy(x=>Random.value).ToArray();
             for(int i=0;i<4;i++)Spawn(friends[i],true,(friends[i]=="Carlos"||friends[i]=="Munhak")?.22f:.65f+Random.value*.18f,i);
             for(int i=0;i<5;i++)Spawn(new[]{"Jett","Phoenix","Sage","Reyna","Omen"}[i],false,.67f+Game.Night.Difficulty*.12f,i);
-            NewRound();Intermission=3;Banner="PARTIDA ENCONTRADA - ASCENT";
+            NewRound();Intermission=3;Banner="PARTIDA ENCONTRADA - ASCENT";Game.Audio.Announce("queue");
         }
         void Spawn(string name,bool ally,float skill,int index)
         {
@@ -166,7 +166,7 @@ namespace TicosHouse
         void UpdateBot(Combatant b,float dt)
         {
             if(!b.Ally&&!Visible(b))return;
-            b.Cooldown-=dt;if(b.Cooldown>0)return;b.Cooldown=b.Ally?Random.Range(1.05f,1.5f)*Mathf.Lerp(2f,1f,Coordination):Random.Range(.22f,.38f);
+            b.Cooldown-=dt;if(b.Cooldown>0)return;b.Cooldown=b.Ally?Random.Range(1.05f,1.5f)*Mathf.Lerp(2f,1f,Coordination):Random.Range(.25f,.42f);
             if(b.Ally){
                 var enemies=Bots.Where(Visible).ToArray();if(enemies.Length==0)return;
                 var target=enemies[Random.Range(0,enemies.Length)];
@@ -180,7 +180,7 @@ namespace TicosHouse
                 b.ShotFlash=.18f;b.AimedAtPlayer=aimPlayer;
                 float chance=b.Skill*(FlashRemaining>0?.12f:1)*(b.Suppressed>0?.55f:1);
                 if(Random.value<chance){
-                    bool headshot=Random.value<.30f;int damage=headshot?Random.Range(100,126):Random.Range(30,45);
+                    bool headshot=Random.value<.27f;int damage=headshot?Random.Range(100,126):Random.Range(30,45);
                     if(aimPlayer){if(headshot){EnemyHeadshots++;EnemyHeadshotFlash=.65f;}Health-=damage;DamageFlash=.23f;if(Health<=0){Health=0;PlayerDead=true;Stats.Deaths++;if(RoundTime<7)Stats.EarlyDeaths++;Game.Night.Stress=Mathf.Min(100,Game.Night.Stress+6);b.Kills++;Banner=headshot?"VOCÊ CAIU — HEADSHOT":"VOCÊ CAIU - o time continua";BannerTime=3;}}
                     else if(friends.Length>0){var target=friends[Random.Range(0,friends.Length)];target.Health-=damage;if(target.Health<=0)Kill(target,b);}
                 }
@@ -200,6 +200,7 @@ namespace TicosHouse
                 if(!PlayerDead&&Bots.All(b=>!b.Ally||!b.Alive)&&RoundKills>0)Stats.Clutches++;if((Blue>=11||Red>=11)&&RoundKills>0)Stats.Decisive++;
             }else{Red++;losses++;Game.Night.Stress=Mathf.Min(100,Game.Night.Stress+2+losses);}
             Banner=won?"ROUND VENCIDO":"ROUND PERDIDO";BannerTime=3;Game.Audio.Fps("ping",Vector3.zero,.2f);
+            Game.Audio.Announce(won?"round_win":"round_loss");
             foreach(var b in Bots)if(b.Model!=null)b.Model.gameObject.SetActive(false);
             if(Blue>=13||Red>=13){
                 MatchOver=true;LastWin=won;Stats.TeamBestKills=Bots.Where(b=>b.Ally).Max(b=>b.Kills);Stats.Mvp=Stats.Kills>=Stats.TeamBestKills;

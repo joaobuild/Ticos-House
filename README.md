@@ -4,7 +4,7 @@
 
 Terror com comédia em primeira pessoa: Gustavo prometeu desligar o computador às 21h, mas entrou em mais uma partida com os amigos. O quarto, o FPS e a casa continuam funcionando ao mesmo tempo.
 
-**Versão 0.1.7 — Windows x64.**
+**Versão 0.1.8 — Windows x64.**
 
 ## Objetivo
 
@@ -54,7 +54,7 @@ O jogo não acessa seu microfone, Discord ou roteador reais. Toda comunicação 
 
 ## Download
 
-Baixe em [Tico's House v0.1.7](https://github.com/joaobuild/Ticos-House/releases/tag/v0.1.7). Extraia a pasta inteira e abra `TicosHouse.exe`. Não é necessário instalar Unity.
+Baixe em [Tico's House v0.1.8](https://github.com/joaobuild/Ticos-House/releases/tag/v0.1.8). Extraia a pasta inteira e abra `TicosHouse.exe`. Não é necessário instalar Unity.
 
 ## Desenvolvimento
 
@@ -123,3 +123,10 @@ Segurar o tiro causa recuo vertical real, desvio lateral e dispersão crescente.
 ### Visual — 0.1.7
 
 Capa com Gust de terno e gravata, integrada ao menu. Quarto com materiais de madeira e tecido, cortinas, detalhes de móveis e luz quente de cabeceira. Personagens com silhuetas arredondadas, detalhes faciais e roupa; Meliça mantém o visual desgrenhado. Antialiasing 4x e até oito luzes por pixel. Arte da capa é ilustrativa; personagens em jogo continuam estilizados e procedurais. Inclui recuo/dispersão da atualização 0.1.6, que ainda não havia sido publicada.
+
+
+### Áudio — 0.1.8
+
+13 falas neurais em português, quatro trechos de ronco humano gravado, filtros de distância, passos com variações e canais dedicados para ronco e diálogo. Efeitos do FPS abaixam durante falas, sem zerar os sons da casa. Os áudios são incluídos na build e não exigem internet. Vozes são sintéticas, não clonagens das pessoas. Créditos do ronco em Docs/AUDIO-CREDITS.md e no StreamingAssets da build.
+
+Bots ligeiramente aliviados: intervalo 0,25–0,42 s entre tiros e headshot em 27% dos acertos; mantidos dano e duelos individuais.

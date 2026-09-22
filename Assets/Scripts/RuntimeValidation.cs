@@ -51,6 +51,16 @@ namespace TicosHouse
             Require(g.Screen.sharedMaterial.shader!=null&&g.Screen.sharedMaterial.shader.isSupported,"shader present and supported");
             Require(g.Fps.Texture.IsCreated(),"monitor render texture allocated");
             Require(Resources.Load<AudioClip>("Voices/brother_warning")!=null,"Portuguese warning audio loaded");
+            bool audioValid=true;
+            foreach(string id in new[]{"AudioReal/snore0","AudioReal/snore1","AudioReal/snore2","AudioReal/snore3","Voices/brother_warning","Voices/tico"}){
+                var clip=Resources.Load<AudioClip>(id);audioValid&=clip!=null&&clip.length>1;
+                if(clip!=null){var samples=new float[clip.samples*clip.channels];clip.GetData(samples,0);float peak=0;foreach(float sample in samples){audioValid&=!float.IsNaN(sample);peak=Mathf.Max(peak,Mathf.Abs(sample));}audioValid&=peak>.01f&&peak<=.65f;}
+            }
+            Require(audioValid,"recorded snore and neural dialogue are non-silent and peak controlled");
+            g.Audio.Sleeping=true;g.Audio.House(HouseCue.Snore,0);Require(g.Audio.SnorePlaying,"recorded snore plays on dedicated source");
+            g.Audio.Sleeping=false;Invoke(g.Audio,"Update");Require(!g.Audio.SnorePlaying,"snore stops when Tico wakes");
+            g.Audio.Quiet=false;g.Audio.Speech("Guilherme: ELE TÁ SUBINDO");Require(g.Audio.DialoguePlaying,"warning uses dedicated dialogue source");
+            g.Audio.StopAll();Require(!g.Audio.DialoguePlaying&&!g.Audio.SnorePlaying,"restart stops speech and snore");g.Audio.Sleeping=true;
             Invoke(g,"StartNight");Invoke(g,"Teleport",new Vector3(.3f,0,.6f));
             var player=FindObjectsByType<CharacterController>(FindObjectsSortMode.None).First(c=>c.name=="Gust first person");
             player.transform.rotation=Quaternion.Euler(0,210,0);g.RoomCamera.transform.localRotation=Quaternion.Euler(9,0,0);
@@ -119,10 +129,10 @@ namespace TicosHouse
                 g.Fps.Health=150;g.Fps.PlayerDead=false;enemy.Cooldown=0;
                 Invoke(g.Fps,"UpdateBot",enemy,.01f); // restore live round after prior death
                 if(g.Fps.Intermission>0){g.Fps.Intermission=0;burst--;continue;}
-                rapidFire&=enemy.Cooldown>=.22f&&enemy.Cooldown<=.38f;
+                rapidFire&=enemy.Cooldown>=.25f&&enemy.Cooldown<=.42f;
             }
             Require(g.Fps.EnemyHeadshots>headshotsBefore&&g.Fps.EnemyHeadshots<headshotsBefore+100,"enemy fire includes headshots and body shots");
-            Require(rapidFire,"enemy cadence is 0.22 to 0.38 seconds");
+            Require(rapidFire,"enemy cadence is 0.25 to 0.42 seconds");
             UnityEngine.Random.state=randomState;
             g.Fps.NewMatch();g.Fps.Intermission=0;
             var ally=g.Fps.Bots.First(b=>b.Ally);enemy=g.Fps.Bots.First(b=>!b.Ally);

@@ -80,3 +80,9 @@ Verifica precisão inicial da arma, dispersão e deslocamento real da mira após
 Verifica capa carregada, texturas de superfície e antialiasing 4x. Runner gera capturas diretamente da câmera para dois ângulos do quarto e Gust, Guilherme e Tico, sem exibir uma janela de teste ao usuário. Inspeção identificou e corrigiu cartaz superdimensionado com texto atravessando os personagens; shader de texto agora respeita profundidade. Arte do menu é uma ilustração, não uma captura dos modelos.
 
 Resultado final 0.1.7: 52 verificações aprovadas (TICOS_QA_PASS). Capturas de quarto e Gust em Docs/Screenshots/Room-v017.png e Gust-v017.png.
+
+## Áudio 0.1.8
+
+Verifica roncos e vozes presentes, duração, amostras finitas, ausência de silêncio e picos <=0,65; fonte dedicada de ronco, interrupção ao acordar, fonte de aviso falado e StopAll. Mantidas regressões de gameplay e cadência atualizada. Vozes geradas por Tools/prepare-audio.py; áudio preparado offline com normalização, remoção de DC e fades. Não houve teste auditivo humano certificado.
+
+Resultado 0.1.8: 57 verificações automatizadas aprovadas na build final (TICOS_QA_PASS).

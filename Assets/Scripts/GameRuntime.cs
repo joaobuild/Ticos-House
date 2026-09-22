@@ -82,6 +82,7 @@ namespace TicosHouse
                 InputNight(dt); Night.Tick(dt);Fps.Tick(dt,ComputerView);
             }
             Audio.FpsVolume=Night.FpsVolume;Audio.Online=Night.Internet;Audio.WearingHeadphones=Night.AtComputer&&Night.MonitorOn;
+            Audio.Sleeping=Night.Tico==TicoState.Sleeping;
             flickerRemaining-=dt;MonitorLight.enabled=Night.MonitorOn&&(flickerRemaining<=0||Mathf.Sin(Time.time*70)>0);
             screenMat.SetColor("_EmissionColor",Night.MonitorOn?Color.white*.65f:Color.black);
             screenMat.color=Night.MonitorOn?Color.white:Color.black;
@@ -130,7 +131,7 @@ namespace TicosHouse
                 // The bedroom is the playable area; the corridor is audio and AI space.
                 if(next.z>3.65f)direction=Vector3.zero;
                 player.Move((player.transform.TransformDirection(direction)*speed+Vector3.down*9)*dt);
-                footTimer-=dt;if(direction.sqrMagnitude>.1f&&footTimer<=0){Night.AddNoise(run?4:1.5f);Audio.House(HouseCue.Footstep,.95f);footTimer=run?.29f:.5f;}
+                footTimer-=dt;if(direction.sqrMagnitude>.1f&&footTimer<=0){Night.AddNoise(run?4:1.5f);Audio.SelfStep();footTimer=run?.29f:.5f;}
                 RoomCamera.transform.localPosition=new Vector3(0,1.65f+Mathf.Sin(Time.time*speed*3)*.015f*direction.magnitude,0);
             }
             if(Night.AtComputer) {

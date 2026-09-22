@@ -33,3 +33,7 @@ AscentBombB.png e AscentTree.png: image_gen integrado, Ascent.png como referênc
 ## Visual 0.1.7
 
 CoverGust.png: image_gen integrado, foto enviada pelo usuário como referência de identidade e roupa. Prompt: key art 16:9 de terror com comédia, Gust à direita com terno preto, camisa branca, gravata turquesa e óculos, iluminação azul do monitor e Tico em silhueta na porta; esquerda escura livre para interface. A foto original não é distribuída. Texturas pequenas e decoração da casa geradas por código próprio em RoomPolish.cs.
+
+## Áudio 0.1.8
+
+Ronco humano licenciado e adaptações: Docs/AUDIO-CREDITS.md. As 13 falas foram substituídas por síntese neural pt-BR-AntonioNeural. Ferramentas de preparação em Tools/prepare-audio.py e Tools/audio-requirements.txt, necessárias apenas para regenerar áudios. O jogo distribuído reproduz os WAVs offline. As vozes não foram clonadas dos participantes.
