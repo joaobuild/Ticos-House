@@ -166,12 +166,15 @@ namespace TicosHouse
         void UpdateBot(Combatant b,float dt)
         {
             if(!b.Ally&&!Visible(b))return;
-            b.Cooldown-=dt;if(b.Cooldown>0)return;b.Cooldown=b.Ally?Random.Range(1.05f,1.5f)*Mathf.Lerp(2f,1f,Coordination):Random.Range(.25f,.42f);
+            bool weakAlly=b.Ally&&(b.Name=="Carlos"||b.Name=="Munhak")&&!b.Exceptional;
+            b.Cooldown-=dt;if(b.Cooldown>0)return;
+            b.Cooldown=b.Ally?(weakAlly?Random.Range(1.05f,1.5f)*Mathf.Lerp(2f,1f,Coordination):Random.Range(1.15f,1.65f)*Mathf.Lerp(1.15f,1f,Coordination)):Random.Range(.25f,.42f);
             if(b.Ally){
                 var enemies=Bots.Where(Visible).ToArray();if(enemies.Length==0)return;
                 var target=enemies[Random.Range(0,enemies.Length)];
-                if(Random.value<b.Skill*Mathf.Lerp(.20f,.85f,Coordination)){
-                    target.Health-=48;target.Suppressed=.65f;
+                float accuracy=b.Skill*(weakAlly?Mathf.Lerp(.20f,.85f,Coordination):Mathf.Lerp(.60f,.98f,Coordination));
+                if(Random.value<accuracy){
+                    target.Health-=weakAlly?48:55;target.Suppressed=.65f;
                     if(target.Health<=0)Kill(target,b);
                 }
             }else{
@@ -191,7 +194,7 @@ namespace TicosHouse
         {
             target.Health=0;target.Deaths++;if(target.Model!=null)target.Model.gameObject.SetActive(false);
             if(!target.Ally){var next=Bots.FirstOrDefault(b=>!b.Ally&&b.Alive);if(next!=null)next.SpawnAt=Mathf.Max(next.SpawnAt,RoundTime+.25f);}
-            if(killer!=null){killer.Kills++;if(target.DamagedByPlayer&&!target.Ally)Stats.Assists++;}
+            if(killer!=null){killer.Kills++;if(target.DamagedByPlayer&&!target.Ally)Stats.Assists++;if(killer.Ally){KillFeed=killer.Name+" > "+target.Name;FeedTime=3;}}
         }
         void EndRound(bool won)
         {

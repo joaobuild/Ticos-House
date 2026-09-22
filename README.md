@@ -4,7 +4,7 @@
 
 Terror com comédia em primeira pessoa: Gustavo prometeu desligar o computador às 21h, mas entrou em mais uma partida com os amigos. O quarto, o FPS e a casa continuam funcionando ao mesmo tempo.
 
-**Versão 0.1.8 — Windows x64.**
+**Versão 0.1.9 — Windows x64.**
 
 ## Objetivo
 
@@ -54,7 +54,7 @@ O jogo não acessa seu microfone, Discord ou roteador reais. Toda comunicação 
 
 ## Download
 
-Baixe em [Tico's House v0.1.8](https://github.com/joaobuild/Ticos-House/releases/tag/v0.1.8). Extraia a pasta inteira e abra `TicosHouse.exe`. Não é necessário instalar Unity.
+Baixe em [Tico's House v0.1.9](https://github.com/joaobuild/Ticos-House/releases/tag/v0.1.9). Extraia a pasta inteira e abra `TicosHouse.exe`. Não é necessário instalar Unity.
 
 ## Desenvolvimento
 
@@ -130,3 +130,8 @@ Capa com Gust de terno e gravata, integrada ao menu. Quarto com materiais de mad
 13 falas neurais em português, quatro trechos de ronco humano gravado, filtros de distância, passos com variações e canais dedicados para ronco e diálogo. Efeitos do FPS abaixam durante falas, sem zerar os sons da casa. Os áudios são incluídos na build e não exigem internet. Vozes são sintéticas, não clonagens das pessoas. Créditos do ronco em Docs/AUDIO-CREDITS.md e no StreamingAssets da build.
 
 Bots ligeiramente aliviados: intervalo 0,25–0,42 s entre tiros e headshot em 27% dos acertos; mantidos dano e duelos individuais.
+
+
+### Aliados — 0.1.9
+
+Joaobuild, Trolezi, Loogins e Tavinho contribuem mais com tiros mais frequentes, precisão base maior e 55 de dano por acerto. Comunicação ainda melhora a eficiência, mas mutar não inutiliza o time. Carlos e Munhak mantêm o comportamento fraco, salvo as raras partidas excepcionais. O aviso de kills mostra eliminações dos aliados. Eliminações dependem de sobrevivência, tempo e participação do Gust; não são concedidas artificialmente por round.

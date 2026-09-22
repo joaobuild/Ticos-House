@@ -86,3 +86,9 @@ Resultado final 0.1.7: 52 verificações aprovadas (TICOS_QA_PASS). Capturas de 
 Verifica roncos e vozes presentes, duração, amostras finitas, ausência de silêncio e picos <=0,65; fonte dedicada de ronco, interrupção ao acordar, fonte de aviso falado e StopAll. Mantidas regressões de gameplay e cadência atualizada. Vozes geradas por Tools/prepare-audio.py; áudio preparado offline com normalização, remoção de DC e fades. Não houve teste auditivo humano certificado.
 
 Resultado 0.1.8: 57 verificações automatizadas aprovadas na build final (TICOS_QA_PASS).
+
+## Contribuição do time 0.1.9
+
+Benchmark integrado com 60 seeds por modo de microfone (120 rounds), dois aliados bons de skill 0,75 e Carlos/Munhak de skill 0,22. Gust simulado tenta tiros no corpo a cada 0,75 s, enquanto vivo; todos os bots usam os sistemas reais. Não é um playtest humano nem garantia de kills em qualquer situação. O runner agora silencia o volume geral apenas durante os testes.
+
+Resultado do benchmark: aliados bons somados 2,2167 kills/round mutado e 2,6667 aberto; Carlos/Munhak somados 0,2167 mutado e 0,8 aberto. Médias desta simulação específica, não garantias de partidas humanas. 59 verificações aprovadas na build final.

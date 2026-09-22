@@ -1,4 +1,4 @@
-# Tico's House v0.1.8 — Windows x64
+# Tico's House v0.1.9 — Windows x64
 
 ## Áudio em foco
 
@@ -26,3 +26,12 @@ Ronco adaptado de Schnarchen 01.ogg, Frank Schwichtenberg / Huhu Uet, CC BY-SA 3
 Vozes ainda são sintéticas; parte dos efeitos continua procedural. Validação automatizada de áudio e gameplay não substitui avaliação humana com diferentes fones/caixas.
 
 Unity 6000.3.14f1 / 6.3 LTS, Windows x64. Projeto de fã não oficial; Valorant, Ascent e agentes pertencem à Riot Games.
+
+
+## Aliados 0.1.9
+
+- Joaobuild, Trolezi, Loogins e Tavinho atiram mais regularmente, acertam mais e causam 55 de dano por acerto.
+- Mutado, esses aliados ainda ajudam; comunicação aberta continua melhorando a contribuição.
+- Carlos e Munhak seguem fracos, com raras exceções já existentes.
+- Aviso de kills mostra eliminações dos aliados. Não há kills atribuídas gratuitamente nem garantia por round.
+- Mantidos os inimigos, os duelos individuais, o recuo e o áudio da 0.1.8.

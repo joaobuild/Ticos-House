@@ -36,7 +36,7 @@ namespace TicosHouse
         }
         IEnumerator Start()
         {
-            g=GetComponent<GameRuntime>();g.TestingFrozen=true;
+            g=GetComponent<GameRuntime>();g.TestingFrozen=true;g.Audio.MasterVolume=0;
             string[] args=Environment.GetCommandLineArgs();int index=Array.IndexOf(args,"--qa-dir");
             output=index>=0&&index+1<args.Length?args[index+1]:Application.persistentDataPath;
             Directory.CreateDirectory(output);
@@ -148,9 +148,33 @@ namespace TicosHouse
                     if(mode==0)mutedDamage+=100-enemy.Health;else openDamage+=100-enemy.Health;
                 }
             }
-            Require(openDamage>mutedDamage*1.5f&&mutedDamage>0,"communication substantially improves ally duel contribution without disabling muted team");
+            Require(openDamage>mutedDamage*1.15f&&mutedDamage>0,"communication improves ally duels while muted allies remain useful");
             Require(openCover>mutedCover*2,"communication improves living ally cover");
             ally.Health=0;Require(g.Fps.TeamCover==0,"dead teammates provide no cover");
+            UnityEngine.Random.state=randomState;g.Night.Stress=savedStress;g.Night.MicOpen=savedMic;
+            g.Fps.NewMatch();randomState=UnityEngine.Random.state;
+            var teammates=g.Fps.Bots.Where(b=>b.Ally).ToArray();
+            string[] benchmarkNames={"Joaobuild","Trolezi","Carlos","Munhak"};
+            for(int i=0;i<4;i++){teammates[i].Name=benchmarkNames[i];teammates[i].Skill=i<2?.75f:.22f;teammates[i].Exceptional=false;}
+            for(int mode=0;mode<2;mode++){
+                int goodKills=0,weakKills=0;g.Night.MicOpen=mode==1;
+                for(int trial=0;trial<60;trial++){
+                    UnityEngine.Random.InitState(9000+trial);g.Night.Stress=20;g.Fps.Blue=g.Fps.Red=0;g.Fps.Intermission=0;Invoke(g.Fps,"NewRound");
+                    int goodBefore=teammates[0].Kills+teammates[1].Kills,weakBefore=teammates[2].Kills+teammates[3].Kills;
+                    float nextShot=.9f;
+                    for(int step=0;step<400&&g.Fps.Intermission<=0;step++){
+                        g.Fps.Tick(.05f,false);
+                        if(!g.Fps.PlayerDead&&g.Fps.Intermission<=0&&g.Fps.RoundTime>=nextShot){
+                            var target=g.Fps.Bots.FirstOrDefault(b=>g.Fps.Visible(b));
+                            if(target!=null){g.Fps.Aim=g.Fps.BodyRect(target).center;Invoke(g.Fps,"Shoot");}nextShot=g.Fps.RoundTime+.75f;
+                        }
+                    }
+                    goodKills+=teammates[0].Kills+teammates[1].Kills-goodBefore;weakKills+=teammates[2].Kills+teammates[3].Kills-weakBefore;
+                    if(trial%10==0)yield return null;
+                }
+                Debug.Log("TEAM_BALANCE mic="+(mode==1)+" goodKillsPerRound="+(goodKills/60f)+" weakKillsPerRound="+(weakKills/60f));
+                Require(goodKills>=48&&goodKills>weakKills*3,"good teammates contribute consistently and outperform Carlos/Munhak mode "+mode);
+            }
             UnityEngine.Random.state=randomState;g.Night.Stress=savedStress;g.Night.MicOpen=savedMic;
             g.Fps.NewMatch();g.Fps.Intermission=0;g.Fps.RoundTime=.36f;
             Require(g.Fps.Bots.Count(b=>g.Fps.Visible(b))==1,"only one enemy enters at a time");
